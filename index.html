@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAuth for MCP Servers &amp; the Provider Landscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
+<style>
+  :root {
+    --amber:  #f5a623;
+    --green:  #4ecb8d;
+    --purple: #a78bfa;
+    --blue:   #60a5fa;
+    --red:    #f87171;
+    --bg:     #0a0a0f;
+    --bg2:    #10101a;
+    --bg3:    #181824;
+    --border: #2a2a3a;
+    --text:   #e8e8f0;
+    --muted:  #8888a8;
+  }
+
+  .reveal-viewport { background: var(--bg); }
+  .reveal .slides section { background: transparent; }
+
+  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
+  .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
+  .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
+  .reveal p  { font-size: .56em; line-height: 1.45; color: var(--text); }
+  .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
+  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
+                 border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
+  .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #cdd6f4; }
+
+  .slide-hdr {
+    display: flex; align-items: center; gap: .4em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: .2em; margin-bottom: .3em;
+  }
+  .slide-hdr .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .42em; font-weight: 500;
+    color: var(--bg); background: var(--amber);
+    padding: .1em .4em; border-radius: 3px;
+    letter-spacing: .04em;
+  }
+  .slide-hdr h2 { margin: 0; font-size: .95em; }
+
+  .cols   { display: grid; gap: .5em; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-6040 { grid-template-columns: 6fr 4fr; }
+  .cols-4060 { grid-template-columns: 4fr 6fr; }
+
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 6px; padding: .35em .6em;
+  }
+  .card.amber { border-left: 3px solid var(--amber); }
+  .card.green { border-left: 3px solid var(--green); }
+  .card.purple{ border-left: 3px solid var(--purple); }
+  .card.blue  { border-left: 3px solid var(--blue); }
+  .card.red   { border-left: 3px solid var(--red); }
+  .card h3 { font-size: .64em; margin: 0 0 .12em; }
+  .card p  { font-size: .52em; margin: 0; color: #b8b8d0; }
+  .card ul { margin: 0; padding-left: 1em; }
+  .card li { font-size: .52em; color: #b8b8d0; margin-bottom: .02em; }
+
+  .reveal table { width: 100%; border-collapse: collapse; font-size: .5em; }
+  .reveal table th { background: var(--bg3); color: var(--amber); font-weight: 600;
+                     padding: .2em .4em; border: 1px solid var(--border); text-align: left; }
+  .reveal table td { padding: .18em .4em; border: 1px solid var(--border); color: #ccc; }
+  .reveal table tr:nth-child(even) td { background: #0e0e18; }
+
+  .a  { color: var(--amber); font-weight: 600; }
+  .g  { color: var(--green); font-weight: 600; }
+  .p  { color: var(--purple); font-weight: 600; }
+  .b  { color: var(--blue); font-weight: 600; }
+  .r  { color: var(--red); font-weight: 600; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  svg.diagram { display: block; margin: 0 auto; overflow: visible; }
+
+  .pill {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: .44em; padding: .08em .4em; border-radius: 99px;
+    border: 1px solid; margin: 0 .08em;
+  }
+  .pill.amber { color: var(--amber); border-color: var(--amber); }
+  .pill.green { color: var(--green); border-color: var(--green); }
+  .pill.purple{ color: var(--purple); border-color: var(--purple); }
+  .pill.blue  { color: var(--blue); border-color: var(--blue); }
+
+  .reveal .slide-footer { display: none; }
+  .title-slide h1 { font-size: 1.8em; }
+  .title-slide .subtitle {
+    font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em;
+  }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .ss-row {
+    display: flex; gap: .25em; align-items: center;
+    margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace;
+  }
+  .ss-node {
+    padding: .2em .55em; border-radius: 5px; font-size: .9em;
+    background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  }
+  .ss-node.active { background: #1a2a1a; border-color: var(--green); color: var(--green); }
+  .ss-node.done   { background: #1a1a2a; border-color: var(--purple); color: var(--purple); }
+  .ss-arrow { color: var(--amber); }
+  .ss-label { font-size: .8em; color: var(--muted); margin-left: .3em; }
+
+  .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
+.reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+
+<!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
+<section class="title-slide" data-background-color="#0a0a0f">
+  <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
+      TECHNICAL PRESENTATION &middot; PART 2 OF 2
+    </div>
+    <h1>OAuth for<br>MCP Servers</h1>
+    <div class="subtitle">Remote MCP, the Docker MCP Gateway &amp; the identity-provider landscape</div>
+    <div style="width:60px; height:3px; background:var(--amber); margin-bottom:1.4em;"></div>
+    <div style="display:flex; gap:1.2em; flex-wrap:wrap; margin-bottom:1em;">
+      <span class="pill amber">MCP Auth Spec</span>
+      <span class="pill green">OAuth 2.1</span>
+      <span class="pill purple">Docker Gateway</span>
+      <span class="pill blue">Auth0 / Keycloak</span>
+    </div>
+    <div class="ss-row" style="margin-top:0.6em;">
+      <span class="ss-node active">🤖 LLM Host</span>
+      <span class="ss-arrow">→</span>
+      <span class="ss-node active">🔌 MCP Server</span>
+      <span class="ss-arrow">→</span>
+      <span class="ss-node active">🔐 Auth Server</span>
+      <span class="ss-arrow">→</span>
+      <span class="ss-node done">🎫 Token (RI + DPoP)</span>
+      <span class="ss-arrow">→</span>
+      <span class="ss-node done">🛠 Tool Call</span>
+    </div>
+    <p style="max-width:660px; color:#a0a0c0; font-size:.56em; line-height:1.5; margin-top:1em;">
+      How remote MCP servers do delegated authorisation; what the Docker MCP Gateway adds; and how to pick a provider — commercial or open-source — that won't paint you into a corner.
+    </p>
+    <div class="meta" style="margin-top:1.4em;">
+      Discover &nbsp;·&nbsp; Register &nbsp;·&nbsp; Authorise &nbsp;·&nbsp; Bind &nbsp;·&nbsp; Audit
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 02 — TOPICS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">01</span>
+    <h2>Topics</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">MCP foundations</h3>
+        <ul>
+          <li>The Model Context Protocol — one-slide refresher</li>
+          <li>Local (stdio) vs Remote (HTTP / SSE / Streamable) servers</li>
+          <li>Why remote MCP <em>has</em> to use OAuth</li>
+          <li>The MCP authorisation profile (2025-06 spec)</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.5em;">
+        <h3 class="g">The MCP OAuth flow</h3>
+        <ul>
+          <li>Discovery — RFC 9728 + RFC 8414</li>
+          <li>Dynamic Client Registration (RFC 7591)</li>
+          <li>End-to-end sequence with Auth Code + PKCE + RIs</li>
+          <li>Confused-deputy &amp; token-passthrough — what NOT to do</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Docker MCP Gateway</h3>
+        <ul>
+          <li>What the Gateway is and why it exists</li>
+          <li>Architecture — catalogs, secrets, OAuth interceptor</li>
+          <li>Centralising auth for many MCP servers behind one front door</li>
+          <li>Compose, MCP Toolkit and CLI usage</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.5em;">
+        <h3 class="b">Provider landscape</h3>
+        <ul>
+          <li>Commercial — Auth0/Okta, Microsoft Entra, AWS Cognito, Google, Stytch, WorkOS, Clerk, Descope, FusionAuth</li>
+          <li>Free / OSS — Keycloak, Authentik, ZITADEL, Ory Hydra, Authelia, Logto, SuperTokens</li>
+          <li>Decision matrix &amp; production checklist</li>
+          <li>Worked examples: Claude.ai → MCP → Auth0; Claude Desktop → Gateway → Keycloak</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 03 — REFRESHER ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">02</span>
+    <h2>OAuth Refresher (One Slide)</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">If you read nothing else from Part 1</h3>
+        <ul>
+          <li><span class="g">Authorization Code + PKCE</span> is the only flow when a user is involved.</li>
+          <li><span class="g">Access tokens</span> = call the API, short-lived. <span class="g">Refresh tokens</span> = mint new access tokens, rotated. <span class="g">ID tokens</span> = identity assertion (OIDC).</li>
+          <li>Tokens must be <span class="g">audience-bound</span> (RFC 8707) and ideally <span class="g">sender-constrained</span> (DPoP / mTLS).</li>
+          <li>OAuth 2.1 = OAuth 2.0 + a decade of errata. PKCE everywhere, no Implicit, no ROPC, no wildcards.</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">The four roles</h3>
+        <ul>
+          <li><span class="b">Resource Owner</span> = user</li>
+          <li><span class="a">Client</span> = the app — here, the MCP host (Claude Desktop, Cursor, claude.ai)</li>
+          <li><span class="p">Authorization Server</span> = issues tokens (Auth0, Keycloak, Entra, ...)</li>
+          <li><span class="g">Resource Server</span> = the MCP server itself</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Tokens at a glance</h3>
+        <table>
+          <thead><tr><th>Token</th><th>Sent to</th><th>Lifetime</th></tr></thead>
+          <tbody>
+            <tr><td>Access</td><td>MCP server</td><td>5–60 min</td></tr>
+            <tr><td>Refresh</td><td>AS only</td><td>hours–days</td></tr>
+            <tr><td>ID (OIDC)</td><td>stays in client</td><td>5–15 min</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card purple" style="margin-top:0.4em;">
+        <h3 class="p">RFCs we'll lean on heavily</h3>
+        <p>RFC 6749 (core) &middot; RFC 7591 (DCR) &middot; RFC 7636 (PKCE) &middot; RFC 8414 (AS metadata) &middot; RFC 8707 (Resource Indicators) &middot; RFC 9068 (JWT AT) &middot; RFC 9449 (DPoP) &middot; RFC 9700 (BCP 240) &middot; RFC 9728 (Protected Resource Metadata)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 04 — WHAT IS MCP ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">03</span>
+    <h2>What Is the Model Context Protocol?</h2>
+  </div>
+  <p><span class="a">MCP</span> is an open protocol from Anthropic (Nov 2024) that standardises how LLM applications talk to <span class="g">tools</span>, <span class="g">resources</span> and <span class="g">prompts</span>. Think of it as <em>"USB-C for AI integrations"</em> — one protocol between any host and any data source or tool.</p>
+
+  <svg class="diagram" viewBox="0 0 920 240" width="860" height="240">
+    <rect x="20"  y="40" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="110" y="65" text-anchor="middle" fill="#60a5fa" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Host</text>
+    <text x="110" y="85" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">Claude Desktop · Cursor · claude.ai · Goose</text>
+    <rect x="20"  y="130" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#f5a623" stroke-width="1.5"/>
+    <text x="110" y="155" text-anchor="middle" fill="#f5a623" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Client</text>
+    <text x="110" y="175" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">one per server, embedded in host</text>
+
+    <line x1="110" y1="100" x2="110" y2="130" stroke="#888" stroke-width="1.2"/>
+
+    <rect x="380" y="40" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="470" y="65" text-anchor="middle" fill="#a78bfa" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Server (local)</text>
+    <text x="470" y="85" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">stdio transport · same machine</text>
+
+    <rect x="380" y="130" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="470" y="155" text-anchor="middle" fill="#a78bfa" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Server (remote)</text>
+    <text x="470" y="175" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">HTTP / SSE / Streamable HTTP</text>
+
+    <line x1="200" y1="70"  x2="380" y2="70"  stroke="#888" stroke-width="1.2"/>
+    <text x="290" y="63" text-anchor="middle" fill="#888" font-family="JetBrains Mono,monospace" font-size="9">stdio JSON-RPC</text>
+    <line x1="200" y1="160" x2="380" y2="160" stroke="#888" stroke-width="1.2"/>
+    <text x="290" y="153" text-anchor="middle" fill="#888" font-family="JetBrains Mono,monospace" font-size="9">HTTP JSON-RPC + SSE</text>
+
+    <rect x="720" y="40" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="810" y="65" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="14" font-weight="700">Local resources</text>
+    <text x="810" y="85" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">filesystem · sqlite · git</text>
+
+    <rect x="720" y="130" width="180" height="60" rx="8" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="810" y="155" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="14" font-weight="700">SaaS APIs</text>
+    <text x="810" y="175" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">GitHub · Slack · Linear · Stripe</text>
+
+    <line x1="560" y1="70"  x2="720" y2="70"  stroke="#888" stroke-width="1.2"/>
+    <line x1="560" y1="160" x2="720" y2="160" stroke="#888" stroke-width="1.2"/>
+
+    <text x="460" y="220" text-anchor="middle" fill="#888" font-family="DM Sans,sans-serif" font-size="11">Local servers run as a subprocess. Remote servers are real network services — and that's where OAuth becomes mandatory.</text>
+  </svg>
+
+  <div class="cols cols-3" style="margin-top:0.2em;">
+    <div class="card amber"><h3 class="a">Tools</h3><p>Functions the LLM can <em>call</em> — write a file, send a Slack message, run a SQL query.</p></div>
+    <div class="card green"><h3 class="g">Resources</h3><p>Data the LLM can <em>read</em> — files, DB rows, doc fragments. Identified by URI.</p></div>
+    <div class="card purple"><h3 class="p">Prompts</h3><p>Reusable templates the host can offer to the user — slash commands, "code review", etc.</p></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 05 — LOCAL VS REMOTE ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">04</span>
+    <h2>Local vs Remote MCP — Why Auth Matters</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card green">
+        <h3 class="g">Local server (stdio)</h3>
+        <ul>
+          <li>Spawned as a child process by the host.</li>
+          <li>Trust boundary = the OS user. Anything that user can do, the server can do.</li>
+          <li>No network — no OAuth, no tokens, no network attacker.</li>
+          <li>Good for: filesystem, local DBs, dev-loop tools.</li>
+          <li>Risk: <em>prompt injection</em> + dangerous tools = local arbitrary code execution.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card amber">
+        <h3 class="a">Remote server (HTTP / Streamable HTTP / SSE)</h3>
+        <ul>
+          <li>Reached over the public internet (or VPC). Multi-tenant. Survives between hosts.</li>
+          <li>Trust boundary = whoever holds a valid token.</li>
+          <li>Needs to know <em>which user</em> is calling and <em>what they're allowed to do</em>.</li>
+          <li>Good for: SaaS connectors, enterprise data, anything where the API isn't on this laptop.</li>
+          <li>Without OAuth, the only options are bearer-API-keys-in-config-files, which puts you back in 2006.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card purple" style="margin-top:0.4em;">
+    <h3 class="p">Why a global API key is wrong for remote MCP</h3>
+    <ul>
+      <li><span class="r">No user identity</span> — the MCP server can't enforce per-user permissions.</li>
+      <li><span class="r">No revocation</span> — leaked once, replayable forever.</li>
+      <li><span class="r">No audit</span> — you can't tell <em>which</em> human triggered which tool.</li>
+      <li><span class="r">No consent</span> — users have no UI to approve or revoke specific scopes.</li>
+      <li><span class="r">No MFA</span> — credential strength is whatever the operator chose, not the org's IdP policy.</li>
+    </ul>
+    <p style="margin-top:.3em;">Every one of these is a thing OAuth gives you for free. That is why the MCP spec mandates it for HTTP transports.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 06 — MCP AUTH SPEC ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">05</span>
+    <h2>The MCP Authorization Profile (2025-06)</h2>
+  </div>
+  <p>The MCP spec includes a normative <span class="a">Authorization</span> section for HTTP-based servers. It's a profile of OAuth 2.1 — pinning the choices a generic spec leaves open.</p>
+
+  <div class="cols cols-2" style="margin-top:0.3em;">
+    <div>
+      <div class="card amber">
+        <h3 class="a">What the MCP profile says — MUST</h3>
+        <ul>
+          <li>The MCP server is an OAuth 2.1 <span class="g">Resource Server</span>.</li>
+          <li>The MCP client uses <span class="g">Authorization Code + PKCE (S256)</span>.</li>
+          <li>The client discovers the AS via the server's <span class="g">RFC 9728 Protected Resource Metadata</span> document.</li>
+          <li>The client uses <span class="g">RFC 8707 Resource Indicators</span> to bind the access token's audience to the MCP server URL.</li>
+          <li>The MCP server validates <code>aud</code> on every token and rejects any token not minted for it.</li>
+          <li>The server returns <span class="g">401 + WWW-Authenticate</span> with a <code>resource_metadata</code> URL when no/expired token is presented.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">What it says — SHOULD / MAY</h3>
+        <ul>
+          <li><span class="g">Dynamic Client Registration</span> (RFC 7591) so users don't have to pre-register every host.</li>
+          <li><span class="g">DPoP</span> (RFC 9449) for sender-constrained tokens — strongly recommended over plain Bearer.</li>
+          <li>Refresh tokens with <span class="g">rotation</span>.</li>
+          <li>Scopes named after MCP capabilities (e.g. <code>tools:write</code>, <code>resources:read</code>).</li>
+          <li>OIDC if the server needs to know who the user is, not just that they're authorised.</li>
+        </ul>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">Anti-patterns the spec calls out by name</h3>
+        <ul>
+          <li><span class="r">Token passthrough</span> — the MCP server forwarding the user's token to a downstream API the client never consented to.</li>
+          <li><span class="r">Confused-deputy</span> tokens — accepting any valid token from "your" AS regardless of audience.</li>
+          <li><span class="r">Static API keys</span> in HTTP headers in lieu of OAuth.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 07 — DISCOVERY ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">06</span>
+    <h2>Discovery — How the Client Finds the AS</h2>
+  </div>
+  <p>The MCP client doesn't get told upfront which auth server to use. It asks the MCP server.</p>
+
+  <svg class="diagram" viewBox="0 0 920 250" width="860" height="250">
+    <rect x="20"  y="20" width="170" height="40" rx="5" fill="#1a1a2a" stroke="#f5a623" stroke-width="1.5"/>
+    <text x="105" y="45" text-anchor="middle" fill="#f5a623" font-family="Playfair Display,serif" font-size="13" font-weight="700">MCP Client</text>
+    <rect x="370" y="20" width="170" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="455" y="45" text-anchor="middle" fill="#a78bfa" font-family="Playfair Display,serif" font-size="13" font-weight="700">MCP Server (RS)</text>
+    <rect x="720" y="20" width="170" height="40" rx="5" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="805" y="45" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="13" font-weight="700">Authorization Server</text>
+
+    <line x1="105" y1="60" x2="105" y2="240" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="455" y1="60" x2="455" y2="240" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="805" y1="60" x2="805" y2="240" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+
+    <line x1="105" y1="80" x2="370" y2="80" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a06a)"/>
+    <text x="240" y="75" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="10">1. POST /tools/list (no token)</text>
+    <line x1="370" y1="105" x2="105" y2="105" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a06p)"/>
+    <text x="240" y="100" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">2. 401 + WWW-Authenticate: Bearer resource_metadata="..."</text>
+    <line x1="105" y1="130" x2="370" y2="130" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a06a)"/>
+    <text x="240" y="125" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="10">3. GET /.well-known/oauth-protected-resource</text>
+    <line x1="370" y1="155" x2="105" y2="155" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a06p)"/>
+    <text x="240" y="150" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">4. { resource: "...", authorization_servers: ["https://as.example.com"] }</text>
+    <line x1="105" y1="180" x2="720" y2="180" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a06a)"/>
+    <text x="410" y="175" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="10">5. GET https://as.example.com/.well-known/oauth-authorization-server</text>
+    <line x1="720" y1="205" x2="105" y2="205" stroke="#4ecb8d" stroke-width="1.2" marker-end="url(#a06g)"/>
+    <text x="410" y="200" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="10">6. { authorization_endpoint, token_endpoint, jwks_uri, registration_endpoint, ... }</text>
+    <text x="410" y="235" text-anchor="middle" fill="#888" font-family="JetBrains Mono,monospace" font-size="10">→ client now knows where to start the OAuth flow</text>
+
+    <defs>
+      <marker id="a06a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f5a623"/></marker>
+      <marker id="a06p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a78bfa"/></marker>
+      <marker id="a06g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4ecb8d"/></marker>
+    </defs>
+  </svg>
+
+  <div class="cols cols-2" style="margin-top:0.2em;">
+    <div class="card amber">
+      <h3 class="a">RFC 9728 — Protected Resource Metadata</h3>
+<pre><code>GET /.well-known/oauth-protected-resource
+
+{
+  "resource": "https://mcp.example.com/",
+  "authorization_servers": [
+    "https://auth.example.com"
+  ],
+  "scopes_supported": ["tools:read","tools:write"],
+  "bearer_methods_supported": ["header"],
+  "resource_documentation": "https://docs..."
+}</code></pre>
+    </div>
+    <div class="card green">
+      <h3 class="g">RFC 8414 — AS Metadata</h3>
+<pre><code>GET /.well-known/oauth-authorization-server
+
+{
+  "issuer": "https://auth.example.com",
+  "authorization_endpoint": ".../authorize",
+  "token_endpoint": ".../token",
+  "registration_endpoint": ".../register",
+  "jwks_uri": ".../jwks",
+  "code_challenge_methods_supported": ["S256"],
+  "grant_types_supported": ["authorization_code","refresh_token"],
+  "dpop_signing_alg_values_supported": ["ES256"]
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 08 — DCR ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">07</span>
+    <h2>Dynamic Client Registration</h2>
+  </div>
+  <p>Pre-MCP, every OAuth client was registered by hand in the AS UI. That doesn't scale to "any user, any host". <span class="a">RFC 7591 Dynamic Client Registration</span> lets the host register itself the first time it sees a server.</p>
+
+  <div class="cols cols-2" style="margin-top:0.3em;">
+    <div>
+      <div class="card amber">
+        <h3 class="a">The DCR call</h3>
+<pre><code>POST /register HTTP/1.1
+Host: auth.example.com
+Content-Type: application/json
+
+{
+  "client_name": "Claude Desktop",
+  "redirect_uris": ["http://127.0.0.1:53682/callback"],
+  "grant_types": ["authorization_code","refresh_token"],
+  "token_endpoint_auth_method": "none",
+  "application_type": "native",
+  "software_id": "com.anthropic.claude",
+  "software_version": "1.4.0"
+}
+
+# response
+{
+  "client_id": "rdM_b1...",
+  "client_id_issued_at": 1700000000,
+  "redirect_uris": [...],
+  "grant_types": [...],
+  ...
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Why MCP needs this</h3>
+        <ul>
+          <li>Hosts (Claude Desktop, Cursor, claude.ai, Goose, custom agents) cannot pre-arrange with every MCP server's AS.</li>
+          <li>DCR turns "first connection" into a one-RPC handshake.</li>
+          <li>Registration produces a per-host, per-AS <code>client_id</code> the host stores locally.</li>
+          <li>The client uses that <code>client_id</code> in every subsequent Authorization Code + PKCE flow.</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:0.4em;">
+        <h3 class="p">DCR with Initial Access Tokens</h3>
+        <p>For tighter control, an AS can require an <span class="a">Initial Access Token</span> on <code>/register</code> — issued out-of-band by an admin. Stops random clients self-registering against an enterprise AS.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">Watch out</h3>
+        <p>Open DCR is a free abuse vector. Enterprise deployments usually disable it and use software statements (RFC 7591 §2.3) or pre-issued client IDs instead.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 09 — END-TO-END FLOW ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">08</span>
+    <h2>End-to-End Sequence — Host → MCP → AS → Resource</h2>
+  </div>
+
+  <svg class="diagram" viewBox="0 0 940 380" width="900" height="380">
+    <rect x="10"  y="10" width="130" height="36" rx="5" fill="#1a1a2a" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="75"  y="33" text-anchor="middle" fill="#60a5fa" font-family="Playfair Display,serif" font-size="12" font-weight="700">User</text>
+    <rect x="190" y="10" width="160" height="36" rx="5" fill="#1a1a2a" stroke="#f5a623" stroke-width="1.5"/>
+    <text x="270" y="33" text-anchor="middle" fill="#f5a623" font-family="Playfair Display,serif" font-size="12" font-weight="700">MCP Host (Client)</text>
+    <rect x="400" y="10" width="160" height="36" rx="5" fill="#1a1a2a" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="480" y="33" text-anchor="middle" fill="#a78bfa" font-family="Playfair Display,serif" font-size="12" font-weight="700">MCP Server (RS)</text>
+    <rect x="610" y="10" width="160" height="36" rx="5" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="690" y="33" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="12" font-weight="700">Authorization Server</text>
+    <rect x="820" y="10" width="110" height="36" rx="5" fill="#1a1a2a" stroke="#f87171" stroke-width="1.5"/>
+    <text x="875" y="33" text-anchor="middle" fill="#f87171" font-family="Playfair Display,serif" font-size="12" font-weight="700">Upstream API</text>
+
+    <line x1="75"  y1="46" x2="75"  y2="370" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="270" y1="46" x2="270" y2="370" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="480" y1="46" x2="480" y2="370" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="690" y1="46" x2="690" y2="370" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="875" y1="46" x2="875" y2="370" stroke="#2a2a3a" stroke-width="1" stroke-dasharray="3,3"/>
+
+    <line x1="75"  y1="60" x2="270" y2="60"  stroke="#60a5fa" stroke-width="1.2" marker-end="url(#a09b)"/>
+    <text x="172" y="56" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono,monospace" font-size="9">1. add server URL</text>
+
+    <line x1="270" y1="80" x2="480" y2="80"  stroke="#f5a623" stroke-width="1.2" marker-end="url(#a09a)"/>
+    <text x="375" y="76" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">2. tools/list (no token)</text>
+    <line x1="480" y1="100" x2="270" y2="100" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a09p)"/>
+    <text x="375" y="96" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">3. 401 + resource_metadata=...</text>
+
+    <line x1="270" y1="120" x2="480" y2="120" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a09a)"/>
+    <text x="375" y="116" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">4. GET /.well-known/oauth-protected-resource</text>
+    <line x1="480" y1="140" x2="270" y2="140" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a09p)"/>
+    <text x="375" y="136" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">5. { authorization_servers, ... }</text>
+
+    <line x1="270" y1="160" x2="690" y2="160" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a09a)"/>
+    <text x="480" y="156" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">6. POST /register (DCR, RFC 7591)</text>
+    <line x1="690" y1="180" x2="270" y2="180" stroke="#4ecb8d" stroke-width="1.2" marker-end="url(#a09g)"/>
+    <text x="480" y="176" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="9">7. { client_id }</text>
+
+    <line x1="270" y1="200" x2="75"  y2="200" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a09a)"/>
+    <text x="172" y="196" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">8. open browser to /authorize+PKCE</text>
+    <line x1="75"  y1="220" x2="690" y2="220" stroke="#60a5fa" stroke-width="1.2" marker-end="url(#a09b)"/>
+    <text x="380" y="216" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono,monospace" font-size="9">9. user logs in &amp; consents (scopes for the MCP server)</text>
+    <line x1="690" y1="240" x2="270" y2="240" stroke="#4ecb8d" stroke-width="1.2" marker-end="url(#a09g)"/>
+    <text x="480" y="236" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="9">10. 302 redirect → loopback?code=...</text>
+
+    <line x1="270" y1="260" x2="690" y2="260" stroke="#f5a623" stroke-width="1.4" marker-end="url(#a09a)"/>
+    <text x="480" y="256" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">11. POST /token (code, code_verifier, resource=https://mcp...)</text>
+    <line x1="690" y1="280" x2="270" y2="280" stroke="#4ecb8d" stroke-width="1.4" marker-end="url(#a09g)"/>
+    <text x="480" y="276" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="9">12. { access_token (aud=https://mcp...), refresh_token }</text>
+
+    <line x1="270" y1="300" x2="480" y2="300" stroke="#f5a623" stroke-width="1.2" marker-end="url(#a09a)"/>
+    <text x="375" y="296" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">13. tools/call  Authorization: Bearer / DPoP &lt;at&gt;</text>
+    <line x1="480" y1="320" x2="875" y2="320" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a09r)"/>
+    <text x="675" y="316" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">14. server's own credentials → upstream API</text>
+    <line x1="875" y1="340" x2="270" y2="340" stroke="#f87171" stroke-width="1.2" marker-end="url(#a09r2)"/>
+    <text x="480" y="336" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono,monospace" font-size="9">15. result → tool response back to host</text>
+
+    <defs>
+      <marker id="a09b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#60a5fa"/></marker>
+      <marker id="a09a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f5a623"/></marker>
+      <marker id="a09p" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a78bfa"/></marker>
+      <marker id="a09g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4ecb8d"/></marker>
+      <marker id="a09r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#a78bfa"/></marker>
+      <marker id="a09r2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f87171"/></marker>
+    </defs>
+  </svg>
+
+  <p style="margin-top:.3em;">Step 14 is the critical separation: the MCP server uses its <em>own</em> credentials upstream — it doesn't replay the user's token. That's how the spec avoids the confused-deputy class of bugs.</p>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 10 — RIs IN MCP ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">09</span>
+    <h2>Resource Indicators &amp; Audience Binding in MCP</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Why RIs are non-negotiable for MCP</h3>
+        <ul>
+          <li>One AS often serves many MCP servers — and other unrelated APIs.</li>
+          <li>Without <code>resource=</code>, an access token issued for an innocent MCP could be replayed against any other RS that trusts the same AS.</li>
+          <li>RFC 8707 lets the client name the intended RS so the AS can pin <code>aud</code>.</li>
+          <li>The MCP server's job: validate <code>aud</code> = <em>its own URL</em>.</li>
+        </ul>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">If you skip RIs</h3>
+        <p>You've built a ready-made <em>token launderer</em>. A compromised MCP server gets bearer tokens it can spend at every RS in the org.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">What it looks like on the wire</h3>
+<pre><code># /authorize
+GET /authorize?
+    response_type=code&
+    client_id=rdM_b1&
+    redirect_uri=http://127.0.0.1:53682/callback&
+    scope=tools:write+resources:read&
+    code_challenge=XYZ&
+    code_challenge_method=S256&
+    state=...&
+    resource=https://mcp.example.com/
+
+# /token
+POST /token
+grant_type=authorization_code&
+code=...&
+code_verifier=...&
+resource=https://mcp.example.com/
+
+# resulting access token (JWT, decoded)
+{
+  "iss": "https://auth.example.com",
+  "sub": "user_42",
+  "aud": "https://mcp.example.com/",
+  "scope": "tools:write resources:read",
+  "client_id": "rdM_b1",
+  "exp": 1700003600
+}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 11 — DPoP IN MCP ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">10</span>
+    <h2>DPoP for MCP — Sender-Constrained Tokens</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Why MCP cares about DPoP specifically</h3>
+        <ul>
+          <li>MCP tokens travel from a host → over the public internet → to an MCP server.</li>
+          <li>Hosts often run on dev laptops with browser extensions, proxies, MITM dev tools — token leak surface is large.</li>
+          <li>A leaked plain Bearer = the attacker can act as the user against the MCP server until expiry.</li>
+          <li>DPoP binds the token to a private key the host generated locally and never sends.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">The exchange</h3>
+<pre><code># 1. host generates a key pair, includes JWK on /token
+POST /token  ...
+DPoP: eyJ...   # proof for the token endpoint
+
+# 2. AS issues an access token bound to that key
+{ "access_token": "eyJ...",
+  "token_type": "DPoP",
+  "expires_in": 600 }
+
+# AT payload includes
+"cnf": { "jkt": "sha256(jwk)" }
+
+# 3. host calls MCP server
+POST /mcp/tools/call
+Authorization: DPoP eyJ...
+DPoP: eyJ...   # fresh proof per request, signs htm+htu+iat+jti</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">What the MCP server must check</h3>
+        <ol style="padding-left:1.2em;">
+          <li>Validate the access token (signature, <code>iss</code>, <code>aud</code>, <code>exp</code>, <code>scope</code>).</li>
+          <li>Parse the <code>DPoP</code> header JWS.</li>
+          <li>Verify the proof is signed by the JWK whose hash matches <code>cnf.jkt</code>.</li>
+          <li>Check <code>htm</code> = request method, <code>htu</code> = request URL.</li>
+          <li>Check <code>iat</code> within a small window (default 60 s).</li>
+          <li>Check <code>jti</code> hasn't been seen before (replay cache).</li>
+        </ol>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">In code (tinypseudo)</h3>
+<pre><code>def authorize(req):
+    at = parse_bearer_or_dpop(req)
+    claims = jwt.verify(at, jwks)
+    require(claims.aud == MY_RS_URL)
+    require("tools:write" in claims.scope)
+    if claims.token_type == "DPoP":
+        proof = req.headers["DPoP"]
+        verify_dpop(proof, claims["cnf"]["jkt"], req)
+    return claims["sub"]</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 12 — ANTI-PATTERNS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">11</span>
+    <h2>Anti-Patterns &amp; Confused-Deputy Pitfalls</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card red">
+        <h3 class="r">1. Token passthrough</h3>
+        <p>The MCP server takes the user's access token and calls a downstream API <em>with it</em>.</p>
+        <ul>
+          <li>The downstream API was never named in the user's consent.</li>
+          <li>The token's <code>aud</code> doesn't match — but downstream APIs that don't validate <code>aud</code> won't notice.</li>
+          <li>This is the OAuth "confused deputy" attack with a thin wrapper.</li>
+        </ul>
+        <p style="margin-top:.3em;"><span class="g">Fix:</span> the MCP server obtains its own credentials for the downstream API (Client Credentials, or Token Exchange RFC 8693 if user identity must be preserved). Never re-send the user's bearer.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">2. Skipping <code>aud</code> checks</h3>
+        <p>"Any token from our AS that signs is fine." → token launderer. Always pin <code>aud == my_rs_url</code>.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">3. Accepting tokens from any issuer</h3>
+        <p>If the server lists multiple AS in its protected-resource metadata, every one is implicitly trusted. Pin to a specific issuer or maintain an explicit allow-list.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card red">
+        <h3 class="r">4. Per-server static API keys ("OAuth on the wire only")</h3>
+        <p>Some early MCP servers fronted a static upstream API key with OAuth login. The AS issues real access tokens, but the server doesn't actually use the user identity downstream — every user shares the same upstream credentials.</p>
+        <p style="margin-top:.3em;">Result: zero per-user audit, no scope enforcement, single-secret breach radius. <span class="g">Fix:</span> per-user upstream creds via Token Exchange or per-user OAuth-on-behalf-of.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">5. Running without DPoP/mTLS over the public internet</h3>
+        <p>Bearer tokens through dev-laptop network paths get leaked. Ship DPoP from day one for any non-trivial scope.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">6. Open DCR with no rate-limiting</h3>
+        <p>Anyone on the internet can spin up infinite client_ids on your AS, blowing through quotas and audit storage. Rate-limit, require Initial Access Tokens, or use software statements.</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">7. Logging the <code>Authorization</code> header</h3>
+        <p>Tokens end up in CloudWatch / Loki / Datadog. Scrub aggressively.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 13 — DOCKER GATEWAY INTRO ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">12</span>
+    <h2>The Docker MCP Gateway — Intro</h2>
+  </div>
+  <p>The <span class="a">Docker MCP Gateway</span> (Docker Inc., 2025) is an open-source binary that fronts <em>many</em> MCP servers (each running in its own container) behind a single endpoint. It pairs with the <span class="a">Docker MCP Catalog</span> and the <span class="a">Docker MCP Toolkit</span> in Docker Desktop.</p>
+
+  <div class="cols cols-2" style="margin-top:0.4em;">
+    <div>
+      <div class="card amber">
+        <h3 class="a">What problem it solves</h3>
+        <ul>
+          <li>Each MCP server has a different install story (npm? Python? Docker?). The Gateway runs them all uniformly as containers from a curated catalog.</li>
+          <li>Each server has its own auth model (env-var API key here, OAuth there). The Gateway centralises secret handling and OAuth.</li>
+          <li>Hosts (Claude Desktop, Cursor, claude.ai, VS Code) want one HTTP endpoint, not <em>n</em>.</li>
+          <li>Operators want one place to log, audit, sign and policy-gate every tool call.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Components</h3>
+        <ul>
+          <li><span class="a">Gateway</span> — the binary. Speaks MCP to hosts upstream and MCP to servers downstream.</li>
+          <li><span class="a">Catalog</span> — JSON/YAML index of vetted servers, container images, default scopes, OAuth metadata.</li>
+          <li><span class="a">Secrets</span> — local secret store; never written into container env vars.</li>
+          <li><span class="a">OAuth Interceptor</span> — handles discovery, registration, code/PKCE, token cache, refresh.</li>
+          <li><span class="a">Toolkit</span> — Docker Desktop UI + CLI for browsing the catalog and enabling servers.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Why Docker, specifically?</h3>
+        <ul>
+          <li>Server images can be pinned, signed (Sigstore / Notation) and scanned like any other.</li>
+          <li>Per-container resource limits, seccomp, no-new-privileges by default — sandboxing for prompt-injected tools.</li>
+          <li>Compose makes "stand up a stack of servers + gateway + AS" a one-liner.</li>
+          <li>Docker Hub already operates as a registry the org's policy engine knows.</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">Where to find it</h3>
+        <p><code>github.com/docker/mcp-gateway</code> &middot; Docker MCP Catalog at <code>hub.docker.com/u/mcp</code> &middot; ships inside Docker Desktop's MCP Toolkit pane.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 14 — DOCKER GATEWAY ARCH ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">13</span>
+    <h2>Docker MCP Gateway — Architecture</h2>
+  </div>
+
+  <svg class="diagram" viewBox="0 0 980 360" width="930" height="360">
+    <!-- Hosts -->
+    <rect x="20"  y="40" width="160" height="50" rx="8" fill="#1a1a2a" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="100" y="65" text-anchor="middle" fill="#60a5fa" font-family="Playfair Display,serif" font-size="13" font-weight="700">Claude Desktop</text>
+    <text x="100" y="80" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">stdio MCP</text>
+    <rect x="20"  y="110" width="160" height="50" rx="8" fill="#1a1a2a" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="100" y="135" text-anchor="middle" fill="#60a5fa" font-family="Playfair Display,serif" font-size="13" font-weight="700">Cursor / VS Code</text>
+    <text x="100" y="150" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">stdio MCP</text>
+    <rect x="20"  y="180" width="160" height="50" rx="8" fill="#1a1a2a" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="100" y="205" text-anchor="middle" fill="#60a5fa" font-family="Playfair Display,serif" font-size="13" font-weight="700">claude.ai (web)</text>
+    <text x="100" y="220" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">Streamable HTTP</text>
+
+    <!-- Gateway -->
+    <rect x="280" y="60" width="280" height="200" rx="10" fill="#10101a" stroke="#f5a623" stroke-width="2"/>
+    <text x="420" y="85" text-anchor="middle" fill="#f5a623" font-family="Playfair Display,serif" font-size="15" font-weight="700">Docker MCP Gateway</text>
+    <rect x="300" y="100" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#f5a623"/>
+    <text x="357" y="122" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">MCP front-end</text>
+    <rect x="425" y="100" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#f5a623"/>
+    <text x="482" y="122" text-anchor="middle" fill="#f5a623" font-family="JetBrains Mono,monospace" font-size="9">Catalog loader</text>
+    <rect x="300" y="145" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="357" y="167" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">OAuth interceptor</text>
+    <rect x="425" y="145" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="482" y="167" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">Token cache</text>
+    <rect x="300" y="190" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#4ecb8d"/>
+    <text x="357" y="212" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="9">Secrets store</text>
+    <rect x="425" y="190" width="115" height="35" rx="4" fill="#1a1a2a" stroke="#4ecb8d"/>
+    <text x="482" y="212" text-anchor="middle" fill="#4ecb8d" font-family="JetBrains Mono,monospace" font-size="9">Audit log</text>
+    <rect x="300" y="235" width="240" height="20" rx="4" fill="#1a1a2a" stroke="#888"/>
+    <text x="420" y="249" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">policy / scope filter / tool allow-list</text>
+
+    <!-- Lines hosts → gateway -->
+    <line x1="180" y1="65"  x2="280" y2="120" stroke="#888" stroke-width="1.2"/>
+    <line x1="180" y1="135" x2="280" y2="150" stroke="#888" stroke-width="1.2"/>
+    <line x1="180" y1="205" x2="280" y2="180" stroke="#888" stroke-width="1.2"/>
+
+    <!-- Containers -->
+    <rect x="640" y="40" width="160" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="720" y="65" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">github MCP (cont.)</text>
+    <rect x="640" y="90" width="160" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="720" y="115" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">slack MCP (cont.)</text>
+    <rect x="640" y="140" width="160" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="720" y="165" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">linear MCP (cont.)</text>
+    <rect x="640" y="190" width="160" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="720" y="215" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">notion MCP (cont.)</text>
+    <rect x="640" y="240" width="160" height="40" rx="5" fill="#1a1a2a" stroke="#a78bfa"/>
+    <text x="720" y="265" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="10">filesystem MCP</text>
+
+    <line x1="560" y1="100" x2="640" y2="60"  stroke="#888"/>
+    <line x1="560" y1="130" x2="640" y2="110" stroke="#888"/>
+    <line x1="560" y1="160" x2="640" y2="160" stroke="#888"/>
+    <line x1="560" y1="190" x2="640" y2="210" stroke="#888"/>
+    <line x1="560" y1="220" x2="640" y2="260" stroke="#888"/>
+
+    <!-- AS -->
+    <rect x="850" y="100" width="120" height="80" rx="8" fill="#1a1a2a" stroke="#4ecb8d" stroke-width="1.5"/>
+    <text x="910" y="135" text-anchor="middle" fill="#4ecb8d" font-family="Playfair Display,serif" font-size="13" font-weight="700">Auth Server</text>
+    <text x="910" y="155" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">Auth0 / Keycloak /</text>
+    <text x="910" y="170" text-anchor="middle" fill="#ccc" font-family="JetBrains Mono,monospace" font-size="9">Entra / ZITADEL ...</text>
+    <line x1="540" y1="160" x2="850" y2="140" stroke="#a78bfa" stroke-width="1.2" stroke-dasharray="4,3"/>
+    <text x="700" y="135" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono,monospace" font-size="9">discovery + DCR + /token (per server)</text>
+
+    <text x="475" y="320" text-anchor="middle" fill="#888" font-family="DM Sans,sans-serif" font-size="11">One MCP endpoint to the host. The Gateway fans out to many sandboxed servers, brokers OAuth per-server, and centralises audit.</text>
+  </svg>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 15 — GATEWAY OAUTH ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">14</span>
+    <h2>Docker MCP Gateway + OAuth — The Interceptor</h2>
+  </div>
+  <p>The Gateway's <span class="a">OAuth interceptor</span> moves the entire OAuth dance out of every host and into one trusted process. Hosts only see "tools that work"; the Gateway holds the tokens.</p>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">What it does</h3>
+        <ul>
+          <li>For each enabled server, reads OAuth metadata from the catalog (issuer, scopes, audience, DCR endpoint).</li>
+          <li>On first use, opens the user's system browser to complete Auth Code + PKCE.</li>
+          <li>Stores access + refresh tokens in the local secrets store, scoped per-server, per-user.</li>
+          <li>Refreshes silently when an access token expires; rotates refresh tokens.</li>
+          <li>Injects the right token on each downstream call to the right MCP server.</li>
+          <li>Logs every tool invocation with user, scope, server, and request hash for audit.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">A catalog entry (sketch)</h3>
+<pre><code>name: github
+image: mcp/github:1.4
+oauth:
+  issuer: https://github.com
+  scopes: [repo, read:user]
+  audience: https://api.github.com
+secrets:
+  - name: GITHUB_PAT
+    optional: true</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Why this is better than each host doing its own OAuth</h3>
+        <ul>
+          <li><span class="g">One consent</span>, all hosts on the machine benefit.</li>
+          <li><span class="g">Tokens never leave a single trust boundary</span> — Cursor doesn't see your Slack token, claude.ai doesn't see your GitHub one unless explicitly allowed.</li>
+          <li><span class="g">Centralised revocation</span> — kill the Gateway secret, every server is logged out.</li>
+          <li><span class="g">Per-server scope enforcement</span> at one chokepoint.</li>
+          <li><span class="g">Audit</span> — one log file vs <em>n</em> hosts × <em>n</em> servers.</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">CLI flow</h3>
+<pre><code># list catalog
+docker mcp catalog ls
+
+# enable a server
+docker mcp server enable github
+# → Gateway opens browser for OAuth
+# → tokens stored in local secret store
+# → 'github' now appears as a tool source to every host
+
+# revoke
+docker mcp server logout github</code></pre>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">Trust note</h3>
+        <p>You are now trusting the Gateway with every connected service's tokens. Run it locally; pin its image; restrict who can talk to its socket. For team deployments, treat it like a privileged credential broker.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 16 — PROVIDER OVERVIEW ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">15</span>
+    <h2>Provider Landscape — At a Glance</h2>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Provider</th><th>Model</th><th>OAuth 2.1 ready</th><th>DCR</th><th>DPoP</th><th>Free tier</th><th>Sweet spot</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="a">Auth0 (Okta)</span></td><td>SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>preview</td><td>7,500 MAU</td><td>Fast time-to-first-token; deep MCP samples.</td></tr>
+      <tr><td><span class="a">Okta Workforce / Customer</span></td><td>SaaS</td><td><span class="g">yes</span></td><td>limited</td><td>n/a</td><td>—</td><td>Enterprise IdP with SCIM, governance, advanced policies.</td></tr>
+      <tr><td><span class="a">Microsoft Entra ID</span></td><td>SaaS</td><td><span class="g">yes</span></td><td>limited</td><td>via FAPI profile</td><td>50k MAU (External ID)</td><td>M365 / Azure shops; CIAM via External ID.</td></tr>
+      <tr><td><span class="a">Google Identity Platform</span></td><td>SaaS</td><td><span class="g">yes</span></td><td>via Firebase</td><td>n/a</td><td>generous</td><td>Consumer apps already on GCP / Firebase.</td></tr>
+      <tr><td><span class="a">AWS Cognito</span></td><td>SaaS</td><td>2.0 + most BCP 240</td><td>limited</td><td>n/a</td><td>50k MAU</td><td>AWS-native CIAM; cheap at scale.</td></tr>
+      <tr><td><span class="a">Stytch</span></td><td>SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>10k MAU</td><td>Modern API-first; strong MCP &amp; agent story.</td></tr>
+      <tr><td><span class="a">WorkOS</span></td><td>SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>via AuthKit</td><td>1M users (AuthKit)</td><td>"SSO / SCIM / MCP for B2B SaaS" turn-key.</td></tr>
+      <tr><td><span class="a">Clerk</span></td><td>SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>preview</td><td>10k MAU</td><td>React/Next.js DX-first; simple MCP integration.</td></tr>
+      <tr><td><span class="a">Descope</span></td><td>SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>preview</td><td>7k MAU</td><td>Drag-and-drop flows; agentic identity features.</td></tr>
+      <tr><td><span class="a">FusionAuth</span></td><td>SaaS or self-host</td><td><span class="g">yes</span></td><td>partial</td><td>n/a</td><td>Community edition free</td><td>Same product on-prem &amp; in cloud; flexible licensing.</td></tr>
+      <tr><td><span class="g">Keycloak</span></td><td>OSS, self-host</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>free</td><td>Most flexible OSS IdP; FAPI 2.0 conformant.</td></tr>
+      <tr><td><span class="g">ZITADEL</span></td><td>OSS or SaaS</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>25k MAU (cloud)</td><td>Modern multi-tenant CIAM; first-class MCP guides.</td></tr>
+      <tr><td><span class="g">Authentik</span></td><td>OSS, self-host</td><td><span class="g">yes</span></td><td>partial</td><td>n/a</td><td>free</td><td>Easy OIDC + SAML for homelabs &amp; small teams.</td></tr>
+      <tr><td><span class="g">Ory Hydra (+ Kratos)</span></td><td>OSS or SaaS (Ory Network)</td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td><span class="g">yes</span></td><td>free</td><td>OAuth/OIDC server you compose with your own login UI.</td></tr>
+      <tr><td><span class="g">Authelia</span></td><td>OSS, self-host</td><td>OIDC 1.0</td><td>limited</td><td>n/a</td><td>free</td><td>Forward-auth for reverse-proxies; great for homelabs.</td></tr>
+      <tr><td><span class="g">Logto</span></td><td>OSS or SaaS</td><td><span class="g">yes</span></td><td>partial</td><td>n/a</td><td>5k MAU (cloud)</td><td>Lightweight CIAM for small SaaS / indie hackers.</td></tr>
+      <tr><td><span class="g">SuperTokens</span></td><td>OSS or SaaS</td><td>core OAuth</td><td>partial</td><td>n/a</td><td>5k MAU</td><td>Self-host with managed dashboard option.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 17 — COMMERCIAL ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">16</span>
+    <h2>Commercial Providers — Detail</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Auth0 (Okta)</h3>
+        <ul>
+          <li>Most-cited SaaS IdP; published official "OAuth for MCP" guides and samples in 2025.</li>
+          <li>Full OIDC, OAuth 2.1, DCR, fine-grained scopes, Actions for custom logic.</li>
+          <li>Free dev tenant: 7,500 MAU (essentials), social connections, basic MFA. Paid plans add SAML, attack protection, large MAU.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">Microsoft Entra ID (formerly Azure AD)</h3>
+        <ul>
+          <li>Default for any org on Microsoft 365.</li>
+          <li>Entra <span class="g">External ID</span> = the CIAM brand (replaces Azure AD B2C). Free tier ~50k MAU.</li>
+          <li>App-registration UI, conditional access, FAPI 2.0 profile available.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">AWS Cognito</h3>
+        <ul>
+          <li>User pools + identity pools; very cheap at scale (free up to 50k MAU on Lite).</li>
+          <li>OAuth 2.0 + OIDC. DCR limited; some BCP 240 items lag behind Auth0.</li>
+          <li>Best when the rest of the stack is on AWS and you want "good enough" without an extra vendor.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">Google Identity Platform / Firebase Auth</h3>
+        <ul>
+          <li>Same engine that powers "Sign in with Google".</li>
+          <li>Firebase Auth = the friendly DX layer; Identity Platform = the enterprise SKU.</li>
+          <li>Strong consumer presence; weaker for B2B SSO.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card amber">
+        <h3 class="a">Stytch</h3>
+        <ul>
+          <li>API-first, opinionated SDKs, explicit MCP &amp; agent identity story (2025).</li>
+          <li>OAuth 2.1, DCR, DPoP, passkeys, magic links, B2B orgs out of the box.</li>
+          <li>Free tier: 10k MAU; metered pricing above.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">WorkOS (AuthKit)</h3>
+        <ul>
+          <li>"Make my B2B SaaS enterprise-ready" — SSO, SCIM, audit logs, AuthKit OIDC.</li>
+          <li>Pivoted hard into MCP server hosting + agent auth in 2025.</li>
+          <li>AuthKit free up to ~1M MAU; SSO connections charged per active connection.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">Clerk</h3>
+        <ul>
+          <li>React/Next.js-first DX; pre-built UI components.</li>
+          <li>Added OAuth-server features (so your app can issue tokens to MCP clients) in 2025.</li>
+          <li>Free up to 10k MAU.</li>
+        </ul>
+      </div>
+      <div class="card amber" style="margin-top:0.4em;">
+        <h3 class="a">Descope &middot; FusionAuth &middot; Frontegg</h3>
+        <ul>
+          <li><span class="a">Descope</span> — drag-and-drop flows; explicit agentic identity features.</li>
+          <li><span class="a">FusionAuth</span> — same product self-host or cloud; permissive licence.</li>
+          <li><span class="a">Frontegg</span> — embedded multi-tenant SaaS auth.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 18 — OSS ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">17</span>
+    <h2>Free / Open-Source Providers — Detail</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card green">
+        <h3 class="g">Keycloak</h3>
+        <ul>
+          <li>Red Hat / community OSS IdP — Apache 2.0.</li>
+          <li>Full OAuth 2.1 + OIDC + SAML, FAPI 2.0 conformant, DCR, DPoP, mTLS.</li>
+          <li>Realms = multi-tenant; clients, scopes, mappers, brokers, fine-grained admin.</li>
+          <li>Heavy (Java/Quarkus); needs Postgres + JVM tuning.</li>
+          <li>De-facto standard when "we'll self-host an IdP" is the answer.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">ZITADEL</h3>
+        <ul>
+          <li>Go, event-sourced, multi-tenant from day one.</li>
+          <li>OAuth 2.1, OIDC, SAML, DPoP, DCR, passkeys, actions.</li>
+          <li>Both <span class="a">self-host</span> (Apache 2.0) and <span class="a">ZITADEL Cloud</span> (free up to 25k MAU).</li>
+          <li>Published explicit "OAuth + MCP" guidance and DPoP support; popular pick for greenfield MCP servers.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Authentik</h3>
+        <ul>
+          <li>Python/Django; LDAP-friendly; great web UI.</li>
+          <li>OIDC + SAML + reverse-proxy auth; enterprise plan adds RAC.</li>
+          <li>Sweet spot: homelabs, small teams, Proxmox / Unraid stacks.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Ory Hydra (+ Kratos + Keto + Oathkeeper)</h3>
+        <ul>
+          <li><span class="a">Hydra</span> = pure OAuth 2.1 / OIDC server; you bring your own login UI (often Kratos).</li>
+          <li><span class="a">Kratos</span> = identity + login flows; <span class="a">Keto</span> = Zanzibar-style permissions; <span class="a">Oathkeeper</span> = identity-aware proxy.</li>
+          <li>Apache 2.0 self-host; Ory Network is the SaaS form.</li>
+          <li>Best for teams that want OAuth without dragging in a full IdP UI.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Authelia</h3>
+        <ul>
+          <li>Forward-auth companion for nginx / Traefik / Caddy.</li>
+          <li>OIDC 1.0 server, MFA, single sign-on for self-hosted services.</li>
+          <li>Light footprint; ideal for homelab stacks pairing with Caddy.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Logto · SuperTokens · Janssen</h3>
+        <ul>
+          <li><span class="a">Logto</span> — modern OSS CIAM with managed cloud option (free 5k MAU).</li>
+          <li><span class="a">SuperTokens</span> — OSS auth with optional managed dashboard.</li>
+          <li><span class="a">Janssen Project</span> — Linux Foundation OAuth/OIDC stack (Gluu lineage); enterprise-grade and FIDO2.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 19 — SAAS VS SELFHOST ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">18</span>
+    <h2>SaaS vs Self-Hosted — Trade-offs</h2>
+  </div>
+
+  <table>
+    <thead><tr><th>Concern</th><th>SaaS (Auth0, Stytch, Entra...)</th><th>Self-host (Keycloak, ZITADEL, Hydra...)</th></tr></thead>
+    <tbody>
+      <tr><td>Time to first OAuth flow</td><td>minutes</td><td>hours – a day</td></tr>
+      <tr><td>Operational burden</td><td>vendor's problem</td><td>your problem (Postgres, JVM, TLS, certs)</td></tr>
+      <tr><td>Compliance evidence</td><td>SOC2 / ISO reports come from vendor</td><td>you produce them</td></tr>
+      <tr><td>Data residency / sovereignty</td><td>vendor regions; sometimes a constraint</td><td>full control</td></tr>
+      <tr><td>Vendor lock-in</td><td>moderate to high; export tooling varies</td><td>low</td></tr>
+      <tr><td>Cost at 100 users</td><td>often free</td><td>~ small VPS</td></tr>
+      <tr><td>Cost at 1M users</td><td>£tens of thousands / month</td><td>~ a few VMs + ops time</td></tr>
+      <tr><td>Custom flows / branding</td><td>limited to vendor primitives</td><td>anything (you wrote it)</td></tr>
+      <tr><td>FedRAMP / sovereign cloud</td><td>special SKUs; not all features</td><td>you choose the cloud</td></tr>
+      <tr><td>"Auth team" required</td><td>no</td><td>yes, eventually</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card amber" style="margin-top:0.4em;">
+    <h3 class="a">A reasonable rule</h3>
+    <p>SaaS until either (a) you're paying more than the cost of one auth engineer, or (b) you have a data-residency / sovereignty / compliance constraint that the SaaS doesn't meet. At that point, Keycloak or ZITADEL self-host.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 20 — DECISION ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">19</span>
+    <h2>Choosing a Provider for an MCP Server</h2>
+  </div>
+
+  <table>
+    <thead><tr><th>If you...</th><th>Strongest pick</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Want to ship a public remote MCP today, minimal ops</td><td><span class="a">Auth0</span> or <span class="a">Stytch</span></td><td>Both publish current MCP samples, full OAuth 2.1, DCR, DPoP-ready, generous free tier.</td></tr>
+      <tr><td>Build a B2B SaaS that resells MCP to enterprise customers</td><td><span class="a">WorkOS</span></td><td>SSO + SCIM + AuthKit + MCP hosting bundled.</td></tr>
+      <tr><td>Are deep in Microsoft 365 / Azure</td><td><span class="a">Microsoft Entra ID</span></td><td>Users already exist; conditional access already configured.</td></tr>
+      <tr><td>Are deep in AWS, cost-sensitive at scale</td><td><span class="a">AWS Cognito</span></td><td>Cheapest hyperscaler CIAM; native IAM glue.</td></tr>
+      <tr><td>Are deep in Next.js / React DX</td><td><span class="a">Clerk</span></td><td>Best-in-class components; OAuth-server features added 2025.</td></tr>
+      <tr><td>Have data residency / air-gap requirements</td><td><span class="g">Keycloak</span> or <span class="g">ZITADEL self-host</span></td><td>Full control of where tokens and PII live.</td></tr>
+      <tr><td>Want OAuth/OIDC but bring your own login UX</td><td><span class="g">Ory Hydra (+ Kratos)</span></td><td>Headless, composable, no opinion on login screens.</td></tr>
+      <tr><td>Run a homelab or 10-user internal stack</td><td><span class="g">Authentik</span> or <span class="g">Authelia</span></td><td>Light, easy, OIDC for everything self-hosted.</td></tr>
+      <tr><td>Need FAPI 2.0 / banking-grade security</td><td><span class="g">Keycloak</span> or <span class="a">Curity</span></td><td>Conformant FAPI profiles, PAR, mTLS, JAR.</td></tr>
+      <tr><td>Want a single binary, OSS, multi-tenant out-of-the-box</td><td><span class="g">ZITADEL</span></td><td>Go, event-sourced, modern CIAM features baked in.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 21 — EXAMPLE 1 ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">20</span>
+    <h2>Worked Example 1 — claude.ai → Remote MCP → Auth0</h2>
+  </div>
+  <p>You ship a public remote MCP server (<code>https://mcp.acme.com</code>) that wraps Acme's REST API. You want claude.ai users to enable it with one click.</p>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Server side</h3>
+        <ol style="padding-left:1.2em;">
+          <li>Create an Auth0 tenant; create an <em>API</em> (audience) <code>https://mcp.acme.com</code> with scopes <code>tools:read</code>, <code>tools:write</code>.</li>
+          <li>Enable <em>Dynamic Application Registration</em> (Auth0's DCR); turn on <em>require Initial Access Token</em> if you want gating.</li>
+          <li>Publish <code>/.well-known/oauth-protected-resource</code> on the MCP server pointing to the Auth0 issuer.</li>
+          <li>On every MCP request, validate the JWT: signature via Auth0 JWKS, <code>iss</code>, <code>aud == https://mcp.acme.com</code>, <code>exp</code>, scope.</li>
+          <li>For DPoP-bound tokens, validate the proof header.</li>
+        </ol>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Server's protected-resource document</h3>
+<pre><code>{
+  "resource": "https://mcp.acme.com/",
+  "authorization_servers": [
+    "https://acme.eu.auth0.com/"
+  ],
+  "scopes_supported": ["tools:read","tools:write"],
+  "bearer_methods_supported": ["header"],
+  "dpop_signing_alg_values_supported": ["ES256"]
+}</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Client side (claude.ai)</h3>
+        <ol style="padding-left:1.2em;">
+          <li>User pastes <code>https://mcp.acme.com</code> into "Add MCP server".</li>
+          <li>claude.ai gets <code>401 + WWW-Authenticate</code> with <code>resource_metadata</code>.</li>
+          <li>Fetches the protected-resource doc; fetches Auth0's <code>/.well-known/oauth-authorization-server</code>.</li>
+          <li>Calls <code>POST /oidc/register</code> on Auth0 (DCR) to mint a per-claude.ai <code>client_id</code>.</li>
+          <li>Pops a system browser to <code>/authorize</code> with <code>response_type=code</code>, PKCE S256, <code>resource=https://mcp.acme.com/</code>, <code>scope=tools:read tools:write</code>.</li>
+          <li>User logs into Auth0, sees consent for the listed scopes.</li>
+          <li>Auth0 redirects back to claude.ai's loopback / <code>https://claude.ai/oauth/callback</code>.</li>
+          <li>claude.ai exchanges the code at <code>/oauth/token</code> with PKCE verifier and <code>resource=</code>.</li>
+          <li>Stores access + refresh tokens in claude.ai's per-server token cache.</li>
+          <li>Calls <code>tools/list</code> on the MCP server; off you go.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 22 — EXAMPLE 2 ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">21</span>
+    <h2>Worked Example 2 — Claude Desktop → Docker Gateway → Keycloak</h2>
+  </div>
+  <p>You're an enterprise. You self-host an internal MCP server (<code>jira-mcp</code>) talking to internal Jira. Claude Desktop must auth users via your existing Keycloak realm.</p>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Topology</h3>
+        <ul>
+          <li><span class="g">User</span> on a laptop with Docker Desktop + MCP Toolkit.</li>
+          <li><span class="g">Claude Desktop</span> → speaks stdio MCP → <span class="g">Docker MCP Gateway</span> (local).</li>
+          <li><span class="g">Gateway</span> → over HTTPS → <span class="g">jira-mcp</span> container in your VPC.</li>
+          <li><span class="g">jira-mcp</span> → calls Jira's internal REST API using a <em>service-account</em> token (Client Credentials), not the user's token.</li>
+          <li><span class="g">Keycloak</span> = the AS, used for both: user → MCP Server, and MCP Server → Jira.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">Keycloak config</h3>
+        <ul>
+          <li>Realm: <code>acme</code>; client: <code>jira-mcp-rs</code> (resource server, audience <code>https://jira-mcp.acme.internal</code>).</li>
+          <li>Realm scopes: <code>jira:issue:read</code>, <code>jira:issue:write</code>, <code>jira:project:read</code>.</li>
+          <li>DCR enabled for <code>application_type=native</code>, restricted to known software statements.</li>
+          <li>FAPI 2.0 profile turned on; DPoP required for the <code>jira-mcp-rs</code> client.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Gateway catalog entry</h3>
+<pre><code>name: jira
+image: registry.acme.internal/mcp/jira:2.1
+oauth:
+  issuer: https://sso.acme.com/realms/acme
+  audience: https://jira-mcp.acme.internal
+  scopes: [jira:issue:read, jira:issue:write]
+  dpop: required
+  initial_access_token_env: KC_DCR_TOKEN
+secrets:
+  - name: KC_DCR_TOKEN
+    source: vault
+audit:
+  destination: https://logs.acme.com/mcp
+  fields: [user_sub, server, tool, scope, request_hash]</code></pre>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">First-run UX</h3>
+        <ol style="padding-left:1.2em;">
+          <li>User enables <code>jira</code> in MCP Toolkit.</li>
+          <li>Gateway reads catalog; calls Keycloak DCR with the Initial Access Token.</li>
+          <li>Opens browser to Keycloak; user does corporate SSO + MFA.</li>
+          <li>Tokens land in Gateway's local secret store, bound to user's keypair (DPoP).</li>
+          <li>Claude Desktop now sees <code>jira</code> tools; every call is logged centrally with the user's <code>sub</code>.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 23 — CHECKLIST ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">22</span>
+    <h2>Production Checklist</h2>
+  </div>
+
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">MCP server (resource server)</h3>
+        <ul>
+          <li>Publish <code>/.well-known/oauth-protected-resource</code>.</li>
+          <li>Pin a single <code>iss</code> (or explicit allow-list).</li>
+          <li>Require <code>aud == my_url</code> on every token.</li>
+          <li>Cache JWKS 10–60 min; refresh on unknown <code>kid</code>.</li>
+          <li>Enforce per-tool minimum scopes — fail closed.</li>
+          <li>Accept DPoP if the AS supports it; reject plain Bearer for write tools.</li>
+          <li>Return rich <code>WWW-Authenticate</code> with <code>resource_metadata</code> on 401.</li>
+          <li>Never forward the user's token downstream — use service credentials or RFC 8693 Token Exchange.</li>
+          <li>Scrub <code>Authorization</code> &amp; <code>DPoP</code> from logs.</li>
+          <li>Rate-limit DCR; require Initial Access Token in production.</li>
+        </ul>
+      </div>
+      <div class="card green" style="margin-top:0.4em;">
+        <h3 class="g">MCP host (client)</h3>
+        <ul>
+          <li>Always Auth Code + PKCE S256 + <code>state</code> + <code>resource=</code>.</li>
+          <li>Use the system browser, never an embedded webview.</li>
+          <li>Generate a fresh DPoP keypair per server (or per session).</li>
+          <li>Rotate refresh tokens; treat reuse as compromise.</li>
+          <li>Store tokens in OS keychain / DPAPI, not plaintext config.</li>
+          <li>Validate the <code>iss</code> on the callback (RFC 9207).</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card purple">
+        <h3 class="p">Authorization server config</h3>
+        <ul>
+          <li>RFC 8414 metadata + RFC 9728 protected-resource metadata.</li>
+          <li>Refresh token rotation on for public clients.</li>
+          <li>Strict <code>redirect_uri</code> string match.</li>
+          <li>DCR disabled by default; opt-in per realm with software statements / Initial Access Tokens.</li>
+          <li>DPoP supported; FAPI 2.0 profile available for high-value APIs.</li>
+          <li>Realm-level audit trail of every <code>/authorize</code>, <code>/token</code>, <code>/register</code>.</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">Operational</h3>
+        <ul>
+          <li>NTP everywhere — JWT clock skew is the most common 401 in prod.</li>
+          <li>Pin AS issuer URL; certificate-pin if you're paranoid.</li>
+          <li>Per-environment client IDs (no shared "dev = prod" credentials).</li>
+          <li>Threat-model the Gateway / MCP server containers — seccomp, no-new-privileges, signed images.</li>
+          <li>Monitor for refresh-token reuse alerts and 401 spikes.</li>
+        </ul>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">Re-read before shipping</h3>
+        <p>RFC 9700 (BCP 240) &middot; MCP Authorization spec &middot; RFC 9728 &middot; RFC 8707 &middot; RFC 9449.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 24 — SUMMARY ═══════════════════════════════ -->
+<section data-background-color="#0a0a0f">
+  <div class="slide-hdr">
+    <span class="tag">23</span>
+    <h2>Summary &amp; References</h2>
+  </div>
+  <div class="cols cols-2">
+    <div>
+      <div class="card amber">
+        <h3 class="a">What we covered</h3>
+        <ul>
+          <li>Why remote MCP needs OAuth (not API keys)</li>
+          <li>The 2025-06 MCP authorization profile — Auth Code + PKCE + RFC 9728 + RFC 8707</li>
+          <li>Discovery flow and Dynamic Client Registration</li>
+          <li>Audience binding and DPoP for sender-constrained tokens</li>
+          <li>Confused-deputy and token-passthrough — the things to avoid</li>
+          <li>The Docker MCP Gateway as a centralised OAuth broker</li>
+          <li>Commercial providers — Auth0, Okta, Microsoft Entra, Google, AWS Cognito, Stytch, WorkOS, Clerk, Descope, FusionAuth</li>
+          <li>Free / OSS providers — Keycloak, ZITADEL, Authentik, Ory Hydra, Authelia, Logto, SuperTokens, Janssen</li>
+          <li>SaaS vs self-host trade-offs &amp; decision matrix</li>
+          <li>Two end-to-end worked examples</li>
+          <li>Production checklist</li>
+        </ul>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">Companion deck — Part 1</h3>
+        <p><span class="a">"Introduction to OAuth"</span> — purpose, history, OAuth 1.0a → 2.0 → 2.1, all grant types, PKCE, OIDC, JWTs, DPoP/mTLS, attacks &amp; defences.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">Take-aways</h3>
+        <ol style="padding-left:1.2em;">
+          <li>Remote MCP is just OAuth 2.1 with one specific profile — Auth Code + PKCE + Resource Indicators on every flow.</li>
+          <li><span class="a">Audience-bind</span> every token. <span class="a">Sender-constrain</span> with DPoP if the user is on the public internet.</li>
+          <li>Don't pass the user's token downstream — that's the confused-deputy door.</li>
+          <li>The Docker MCP Gateway turns "OAuth in every host" into "OAuth in one trusted local broker".</li>
+          <li>Provider choice: SaaS for speed, self-host for sovereignty. Auth0/Stytch and Keycloak/ZITADEL are the safe defaults at each end.</li>
+        </ol>
+      </div>
+      <div class="card purple" style="margin-top:0.4em;">
+        <h3 class="p">References</h3>
+        <p>MCP spec — modelcontextprotocol.io/specification &middot; Anthropic MCP docs — docs.anthropic.com/mcp &middot; Docker MCP Gateway — github.com/docker/mcp-gateway &middot; Docker MCP Catalog — hub.docker.com/u/mcp &middot; Auth0 MCP guide — auth0.com/blog/mcp-oauth &middot; ZITADEL MCP guide — zitadel.com/docs &middot; Stytch MCP guide — stytch.com/docs/mcp &middot; WorkOS MCP &middot; RFC 6749, 6750, 7591, 7636, 8414, 8628, 8693, 8705, 8707, 9068, 9126, 9396, 9449, 9700, 9728</p>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">One-line takeaway</h3>
+        <p>OAuth for MCP is not a new protocol — it's a small set of pinned choices on top of OAuth 2.1. Pick a conformant provider, validate <code>aud</code>, and let the Gateway hold your tokens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+</div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/plugin/highlight/highlight.min.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  controls: true,
+  progress: true,
+  center: false,
+  width: 1100,
+  height: 900,
+  margin: 0.01,
+  plugins: [RevealHighlight],
+  highlight: { theme: 'monokai' }
+});
+</script>
+<script>
+(function(){
+  var h = Reveal.getConfig().height || 900;
+  var m = Reveal.getConfig().margin || 0.02;
+  var maxH = Math.floor(h * (1 - 2 * m)) + 'px';
+  function fixSlides(){
+    document.querySelectorAll('.reveal .slides>section,.reveal .slides>section>section').forEach(function(s){
+      s.style.display = 'block';
+      s.style.maxHeight = maxH;
+    });
+  }
+  Reveal.on('ready', fixSlides);
+  Reveal.on('slidechanged', fixSlides);
+})();
+</script>
+</body>
+</html>
