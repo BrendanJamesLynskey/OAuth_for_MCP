@@ -6,7 +6,9 @@ An interactive Reveal.js presentation covering **OAuth for the Model Context Pro
 
 ## 📄 [Markdown Version](presentation.md)
 
-## 📚 [Companion deck — Introduction to OAuth (Part 1)](https://brendanjameslynskey.github.io/Introduction_to_OAuth/)
+## 🌱 [Primer (Part 0) — OAuth: A Gentle Primer](https://brendanjameslynskey.github.io/OAuth_Primer/)
+
+## 📚 [Companion deck (Part 1) — Introduction to OAuth](https://brendanjameslynskey.github.io/Introduction_to_OAuth/)
 
 ---
 
@@ -62,7 +64,8 @@ MCP specification — modelcontextprotocol.io/specification · Anthropic MCP doc
 
 ## See also
 
-- [Introduction to OAuth](https://github.com/BrendanJamesLynskey/Introduction_to_OAuth) — Part 1, the OAuth foundations this deck builds on.
+- [OAuth — A Gentle Primer (Part 0)](https://github.com/BrendanJamesLynskey/OAuth_Primer) — start here if delegated-auth is new to you.
+- [Introduction to OAuth (Part 1)](https://github.com/BrendanJamesLynskey/Introduction_to_OAuth) — the OAuth protocol foundations this deck builds on.
 - [Introduction to OpenID Connect](https://github.com/BrendanJamesLynskey/Introduction_to_OpenID_Connect) — the identity layer used wherever an MCP server needs to know *who* the user is, not just *what* they're allowed to do.
 - [Cloud_aaS_04_SaaS_Architecture](https://github.com/BrendanJamesLynskey/Cloud_aaS_04_SaaS_Architecture) — B2B identity (SAML / OIDC / SCIM) for multi-tenant SaaS.
 - Series hub: [Cloud `*aaS`](https://github.com/BrendanJamesLynskey/Cloud_aaS_Hub).
