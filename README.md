@@ -60,6 +60,13 @@ Single self-contained `index.html` — no build step, no npm, no dependencies to
 
 MCP specification — modelcontextprotocol.io/specification · Anthropic MCP docs — docs.anthropic.com/mcp · Docker MCP Gateway — github.com/docker/mcp-gateway · Docker MCP Catalog — hub.docker.com/u/mcp · Auth0 MCP guide · ZITADEL MCP guide · Stytch MCP guide · WorkOS MCP · RFC 6749 (OAuth 2.0) · RFC 6750 (Bearer) · RFC 7591 (DCR) · RFC 7636 (PKCE) · RFC 8252 (Native Apps) · RFC 8414 (AS Metadata) · RFC 8628 (Device) · RFC 8693 (Token Exchange) · RFC 8705 (mTLS) · RFC 8707 (Resource Indicators) · RFC 9068 (JWT AT) · RFC 9126 (PAR) · RFC 9396 (RAR) · RFC 9449 (DPoP) · RFC 9700 (BCP 240 — Security BCP) · RFC 9728 (Protected Resource Metadata) · OpenID Connect Core 1.0
 
+## See also
+
+- [Introduction to OAuth](https://github.com/BrendanJamesLynskey/Introduction_to_OAuth) — Part 1, the OAuth foundations this deck builds on.
+- [Introduction to OpenID Connect](https://github.com/BrendanJamesLynskey/Introduction_to_OpenID_Connect) — the identity layer used wherever an MCP server needs to know *who* the user is, not just *what* they're allowed to do.
+- [Cloud_aaS_04_SaaS_Architecture](https://github.com/BrendanJamesLynskey/Cloud_aaS_04_SaaS_Architecture) — B2B identity (SAML / OIDC / SCIM) for multi-tenant SaaS.
+- Series hub: [Cloud `*aaS`](https://github.com/BrendanJamesLynskey/Cloud_aaS_Hub).
+
 ## License
 
 Educational use. Code examples provided as-is.
