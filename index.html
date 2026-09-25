@@ -6,7 +6,7 @@
 <title>OAuth for MCP Servers &amp; the Provider Landscape</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus:wght@400&family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Spline+Sans+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/reveal.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.6.1/theme/black.min.css">
 <style>
@@ -27,14 +27,14 @@
   .reveal-viewport { background: var(--bg); }
   .reveal .slides section { background: transparent; }
 
-  .reveal { font-family: 'DM Sans', sans-serif; color: var(--text); }
-  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
+  .reveal { font-family: 'Hanken Grotesk', sans-serif; color: var(--text); }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: 'Marcellus', serif; font-weight: 700; }
   .reveal h1 { font-size: 1.6em; color: var(--amber); line-height: 1.1; }
   .reveal h2 { font-size: 1.1em; color: var(--amber); margin-bottom: .2em; }
   .reveal h3 { font-size: .78em; color: var(--green); margin-bottom: .15em; }
   .reveal p  { font-size: .56em; line-height: 1.45; color: var(--text); }
   .reveal li { font-size: .54em; line-height: 1.45; margin-bottom: .1em; }
-  .reveal code { font-family: 'JetBrains Mono', monospace; font-size: .72em; }
+  .reveal code { font-family: 'Spline Sans Mono', monospace; font-size: .72em; }
   .reveal pre  { box-shadow: none; background: var(--bg3); border: 1px solid var(--border);
                  border-radius: 6px; padding: .3em .5em; margin: .25em 0; }
   .reveal pre code { font-size: .52em; line-height: 1.35; background: transparent; color: #d9dcce; }
@@ -45,7 +45,7 @@
     padding-bottom: .2em; margin-bottom: .3em;
   }
   .slide-hdr .tag {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Spline Sans Mono', monospace;
     font-size: .42em; font-weight: 500;
     color: var(--bg); background: var(--amber);
     padding: .1em .4em; border-radius: 3px;
@@ -84,12 +84,12 @@
   .p  { color: var(--purple); font-weight: 600; }
   .b  { color: var(--blue); font-weight: 600; }
   .r  { color: var(--red); font-weight: 600; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
+  .mono { font-family: 'Spline Sans Mono', monospace; }
 
   svg.diagram { display: block; margin: 0 auto; overflow: visible; }
 
   .pill {
-    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    display: inline-block; font-family: 'Spline Sans Mono', monospace;
     font-size: .44em; padding: .08em .4em; border-radius: 99px;
     border: 1px solid; margin: 0 .08em;
   }
@@ -101,14 +101,14 @@
   .reveal .slide-footer { display: none; }
   .title-slide h1 { font-size: 1.8em; }
   .title-slide .subtitle {
-    font-size: .7em; color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-size: .7em; color: var(--green); font-family: 'Hanken Grotesk', sans-serif;
     font-weight: 300; letter-spacing: .04em; margin: .3em 0 .6em;
   }
-  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .title-slide .meta { font-size: .48em; color: var(--muted); font-family: 'Spline Sans Mono', monospace; }
 
   .ss-row {
     display: flex; gap: .25em; align-items: center;
-    margin: .1em 0; font-size: .55em; font-family: 'JetBrains Mono', monospace;
+    margin: .1em 0; font-size: .55em; font-family: 'Spline Sans Mono', monospace;
   }
   .ss-node {
     padding: .2em .55em; border-radius: 5px; font-size: .9em;
@@ -122,6 +122,7 @@
   .reveal ul, .reveal ol { margin: .15em 0 .15em 1em; }
 .reveal .slides > section { display: flex !important; flex-direction: column !important; overflow-y: auto !important; align-items: stretch !important; justify-content: flex-start !important; }
 </style>
+<style>:root{font-synthesis-weight:none}</style>
 </head>
 <body>
 <div class="reveal">
@@ -131,7 +132,7 @@
 <!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
 <section class="title-slide" data-background-color="#0f231c">
   <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
-    <div style="font-family:'JetBrains Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
+    <div style="font-family:'Spline Sans Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
       TECHNICAL PRESENTATION &middot; PART 2 OF 2
     </div>
     <h1>OAuth for<br>MCP Servers</h1>
@@ -274,39 +275,39 @@
 
   <svg class="diagram" viewBox="0 0 920 240" width="860" height="240">
     <rect x="20"  y="40" width="180" height="60" rx="8" fill="#19342a" stroke="#93b6cd" stroke-width="1.5"/>
-    <text x="110" y="65" text-anchor="middle" fill="#93b6cd" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Host</text>
-    <text x="110" y="85" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">Claude Desktop · Cursor · claude.ai · Goose</text>
+    <text x="110" y="65" text-anchor="middle" fill="#93b6cd" font-family="Marcellus,serif" font-size="14" font-weight="700">MCP Host</text>
+    <text x="110" y="85" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">Claude Desktop · Cursor · claude.ai · Goose</text>
     <rect x="20"  y="130" width="180" height="60" rx="8" fill="#19342a" stroke="#cfad64" stroke-width="1.5"/>
-    <text x="110" y="155" text-anchor="middle" fill="#cfad64" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Client</text>
-    <text x="110" y="175" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">one per server, embedded in host</text>
+    <text x="110" y="155" text-anchor="middle" fill="#cfad64" font-family="Marcellus,serif" font-size="14" font-weight="700">MCP Client</text>
+    <text x="110" y="175" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">one per server, embedded in host</text>
 
     <line x1="110" y1="100" x2="110" y2="130" stroke="#7c968b" stroke-width="1.2"/>
 
     <rect x="380" y="40" width="180" height="60" rx="8" fill="#19342a" stroke="#b2a3d0" stroke-width="1.5"/>
-    <text x="470" y="65" text-anchor="middle" fill="#b2a3d0" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Server (local)</text>
-    <text x="470" y="85" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">stdio transport · same machine</text>
+    <text x="470" y="65" text-anchor="middle" fill="#b2a3d0" font-family="Marcellus,serif" font-size="14" font-weight="700">MCP Server (local)</text>
+    <text x="470" y="85" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">stdio transport · same machine</text>
 
     <rect x="380" y="130" width="180" height="60" rx="8" fill="#19342a" stroke="#b2a3d0" stroke-width="1.5"/>
-    <text x="470" y="155" text-anchor="middle" fill="#b2a3d0" font-family="Playfair Display,serif" font-size="14" font-weight="700">MCP Server (remote)</text>
-    <text x="470" y="175" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">HTTP / SSE / Streamable HTTP</text>
+    <text x="470" y="155" text-anchor="middle" fill="#b2a3d0" font-family="Marcellus,serif" font-size="14" font-weight="700">MCP Server (remote)</text>
+    <text x="470" y="175" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">HTTP / SSE / Streamable HTTP</text>
 
     <line x1="200" y1="70"  x2="380" y2="70"  stroke="#7c968b" stroke-width="1.2"/>
-    <text x="290" y="63" text-anchor="middle" fill="#7c968b" font-family="JetBrains Mono,monospace" font-size="9">stdio JSON-RPC</text>
+    <text x="290" y="63" text-anchor="middle" fill="#7c968b" font-family="Spline Sans Mono,monospace" font-size="9">stdio JSON-RPC</text>
     <line x1="200" y1="160" x2="380" y2="160" stroke="#7c968b" stroke-width="1.2"/>
-    <text x="290" y="153" text-anchor="middle" fill="#7c968b" font-family="JetBrains Mono,monospace" font-size="9">HTTP JSON-RPC + SSE</text>
+    <text x="290" y="153" text-anchor="middle" fill="#7c968b" font-family="Spline Sans Mono,monospace" font-size="9">HTTP JSON-RPC + SSE</text>
 
     <rect x="720" y="40" width="180" height="60" rx="8" fill="#19342a" stroke="#8fc9a1" stroke-width="1.5"/>
-    <text x="810" y="65" text-anchor="middle" fill="#8fc9a1" font-family="Playfair Display,serif" font-size="14" font-weight="700">Local resources</text>
-    <text x="810" y="85" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">filesystem · sqlite · git</text>
+    <text x="810" y="65" text-anchor="middle" fill="#8fc9a1" font-family="Marcellus,serif" font-size="14" font-weight="700">Local resources</text>
+    <text x="810" y="85" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">filesystem · sqlite · git</text>
 
     <rect x="720" y="130" width="180" height="60" rx="8" fill="#19342a" stroke="#8fc9a1" stroke-width="1.5"/>
-    <text x="810" y="155" text-anchor="middle" fill="#8fc9a1" font-family="Playfair Display,serif" font-size="14" font-weight="700">SaaS APIs</text>
-    <text x="810" y="175" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">GitHub · Slack · Linear · Stripe</text>
+    <text x="810" y="155" text-anchor="middle" fill="#8fc9a1" font-family="Marcellus,serif" font-size="14" font-weight="700">SaaS APIs</text>
+    <text x="810" y="175" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">GitHub · Slack · Linear · Stripe</text>
 
     <line x1="560" y1="70"  x2="720" y2="70"  stroke="#7c968b" stroke-width="1.2"/>
     <line x1="560" y1="160" x2="720" y2="160" stroke="#7c968b" stroke-width="1.2"/>
 
-    <text x="460" y="220" text-anchor="middle" fill="#7c968b" font-family="DM Sans,sans-serif" font-size="11">Local servers run as a subprocess. Remote servers are real network services — and that's where OAuth becomes mandatory.</text>
+    <text x="460" y="220" text-anchor="middle" fill="#7c968b" font-family="Hanken Grotesk,sans-serif" font-size="11">Local servers run as a subprocess. Remote servers are real network services — and that's where OAuth becomes mandatory.</text>
   </svg>
 
   <div class="cols cols-3" style="margin-top:0.2em;">
@@ -421,29 +422,29 @@
 
   <svg class="diagram" viewBox="0 0 920 250" width="860" height="250">
     <rect x="20"  y="20" width="170" height="40" rx="5" fill="#19342a" stroke="#cfad64" stroke-width="1.5"/>
-    <text x="105" y="45" text-anchor="middle" fill="#cfad64" font-family="Playfair Display,serif" font-size="13" font-weight="700">MCP Client</text>
+    <text x="105" y="45" text-anchor="middle" fill="#cfad64" font-family="Marcellus,serif" font-size="13" font-weight="700">MCP Client</text>
     <rect x="370" y="20" width="170" height="40" rx="5" fill="#19342a" stroke="#b2a3d0" stroke-width="1.5"/>
-    <text x="455" y="45" text-anchor="middle" fill="#b2a3d0" font-family="Playfair Display,serif" font-size="13" font-weight="700">MCP Server (RS)</text>
+    <text x="455" y="45" text-anchor="middle" fill="#b2a3d0" font-family="Marcellus,serif" font-size="13" font-weight="700">MCP Server (RS)</text>
     <rect x="720" y="20" width="170" height="40" rx="5" fill="#19342a" stroke="#8fc9a1" stroke-width="1.5"/>
-    <text x="805" y="45" text-anchor="middle" fill="#8fc9a1" font-family="Playfair Display,serif" font-size="13" font-weight="700">Authorization Server</text>
+    <text x="805" y="45" text-anchor="middle" fill="#8fc9a1" font-family="Marcellus,serif" font-size="13" font-weight="700">Authorization Server</text>
 
     <line x1="105" y1="60" x2="105" y2="240" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
     <line x1="455" y1="60" x2="455" y2="240" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
     <line x1="805" y1="60" x2="805" y2="240" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
 
     <line x1="105" y1="80" x2="370" y2="80" stroke="#cfad64" stroke-width="1.2" marker-end="url(#85465caa)"/>
-    <text x="240" y="75" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="10">1. POST /tools/list (no token)</text>
+    <text x="240" y="75" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="10">1. POST /tools/list (no token)</text>
     <line x1="370" y1="105" x2="105" y2="105" stroke="#b2a3d0" stroke-width="1.2" marker-end="url(#a06p)"/>
-    <text x="240" y="100" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">2. 401 + WWW-Authenticate: Bearer resource_metadata="..."</text>
+    <text x="240" y="100" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">2. 401 + WWW-Authenticate: Bearer resource_metadata="..."</text>
     <line x1="105" y1="130" x2="370" y2="130" stroke="#cfad64" stroke-width="1.2" marker-end="url(#85465caa)"/>
-    <text x="240" y="125" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="10">3. GET /.well-known/oauth-protected-resource</text>
+    <text x="240" y="125" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="10">3. GET /.well-known/oauth-protected-resource</text>
     <line x1="370" y1="155" x2="105" y2="155" stroke="#b2a3d0" stroke-width="1.2" marker-end="url(#a06p)"/>
-    <text x="240" y="150" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">4. { resource: "...", authorization_servers: ["https://as.example.com"] }</text>
+    <text x="240" y="150" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">4. { resource: "...", authorization_servers: ["https://as.example.com"] }</text>
     <line x1="105" y1="180" x2="720" y2="180" stroke="#cfad64" stroke-width="1.2" marker-end="url(#85465caa)"/>
-    <text x="410" y="175" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="10">5. GET https://as.example.com/.well-known/oauth-authorization-server</text>
+    <text x="410" y="175" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="10">5. GET https://as.example.com/.well-known/oauth-authorization-server</text>
     <line x1="720" y1="205" x2="105" y2="205" stroke="#8fc9a1" stroke-width="1.2" marker-end="url(#a06g)"/>
-    <text x="410" y="200" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="10">6. { authorization_endpoint, token_endpoint, jwks_uri, registration_endpoint, ... }</text>
-    <text x="410" y="235" text-anchor="middle" fill="#7c968b" font-family="JetBrains Mono,monospace" font-size="10">→ client now knows where to start the OAuth flow</text>
+    <text x="410" y="200" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="10">6. { authorization_endpoint, token_endpoint, jwks_uri, registration_endpoint, ... }</text>
+    <text x="410" y="235" text-anchor="middle" fill="#7c968b" font-family="Spline Sans Mono,monospace" font-size="10">→ client now knows where to start the OAuth flow</text>
 
     <defs>
       <marker id="a06a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#cfad64"/></marker>
@@ -554,15 +555,15 @@ Content-Type: application/json
 
   <svg class="diagram" viewBox="0 0 940 380" width="900" height="380">
     <rect x="10"  y="10" width="130" height="36" rx="5" fill="#19342a" stroke="#93b6cd" stroke-width="1.5"/>
-    <text x="75"  y="33" text-anchor="middle" fill="#93b6cd" font-family="Playfair Display,serif" font-size="12" font-weight="700">User</text>
+    <text x="75"  y="33" text-anchor="middle" fill="#93b6cd" font-family="Marcellus,serif" font-size="12" font-weight="700">User</text>
     <rect x="190" y="10" width="160" height="36" rx="5" fill="#19342a" stroke="#cfad64" stroke-width="1.5"/>
-    <text x="270" y="33" text-anchor="middle" fill="#cfad64" font-family="Playfair Display,serif" font-size="12" font-weight="700">MCP Host (Client)</text>
+    <text x="270" y="33" text-anchor="middle" fill="#cfad64" font-family="Marcellus,serif" font-size="12" font-weight="700">MCP Host (Client)</text>
     <rect x="400" y="10" width="160" height="36" rx="5" fill="#19342a" stroke="#b2a3d0" stroke-width="1.5"/>
-    <text x="480" y="33" text-anchor="middle" fill="#b2a3d0" font-family="Playfair Display,serif" font-size="12" font-weight="700">MCP Server (RS)</text>
+    <text x="480" y="33" text-anchor="middle" fill="#b2a3d0" font-family="Marcellus,serif" font-size="12" font-weight="700">MCP Server (RS)</text>
     <rect x="610" y="10" width="160" height="36" rx="5" fill="#19342a" stroke="#8fc9a1" stroke-width="1.5"/>
-    <text x="690" y="33" text-anchor="middle" fill="#8fc9a1" font-family="Playfair Display,serif" font-size="12" font-weight="700">Authorization Server</text>
+    <text x="690" y="33" text-anchor="middle" fill="#8fc9a1" font-family="Marcellus,serif" font-size="12" font-weight="700">Authorization Server</text>
     <rect x="820" y="10" width="110" height="36" rx="5" fill="#19342a" stroke="#da7d6b" stroke-width="1.5"/>
-    <text x="875" y="33" text-anchor="middle" fill="#da7d6b" font-family="Playfair Display,serif" font-size="12" font-weight="700">Upstream API</text>
+    <text x="875" y="33" text-anchor="middle" fill="#da7d6b" font-family="Marcellus,serif" font-size="12" font-weight="700">Upstream API</text>
 
     <line x1="75"  y1="46" x2="75"  y2="370" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
     <line x1="270" y1="46" x2="270" y2="370" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
@@ -571,41 +572,41 @@ Content-Type: application/json
     <line x1="875" y1="46" x2="875" y2="370" stroke="#29483d" stroke-width="1" stroke-dasharray="3,3"/>
 
     <line x1="75"  y1="60" x2="270" y2="60"  stroke="#93b6cd" stroke-width="1.2" marker-end="url(#8b466abb)"/>
-    <text x="172" y="56" text-anchor="middle" fill="#93b6cd" font-family="JetBrains Mono,monospace" font-size="9">1. add server URL</text>
+    <text x="172" y="56" text-anchor="middle" fill="#93b6cd" font-family="Spline Sans Mono,monospace" font-size="9">1. add server URL</text>
 
     <line x1="270" y1="80" x2="480" y2="80"  stroke="#cfad64" stroke-width="1.2" marker-end="url(#8b466aaa)"/>
-    <text x="375" y="76" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">2. tools/list (no token)</text>
+    <text x="375" y="76" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">2. tools/list (no token)</text>
     <line x1="480" y1="100" x2="270" y2="100" stroke="#b2a3d0" stroke-width="1.2" marker-end="url(#a09p)"/>
-    <text x="375" y="96" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">3. 401 + resource_metadata=...</text>
+    <text x="375" y="96" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">3. 401 + resource_metadata=...</text>
 
     <line x1="270" y1="120" x2="480" y2="120" stroke="#cfad64" stroke-width="1.2" marker-end="url(#8b466aaa)"/>
-    <text x="375" y="116" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">4. GET /.well-known/oauth-protected-resource</text>
+    <text x="375" y="116" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">4. GET /.well-known/oauth-protected-resource</text>
     <line x1="480" y1="140" x2="270" y2="140" stroke="#b2a3d0" stroke-width="1.2" marker-end="url(#a09p)"/>
-    <text x="375" y="136" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">5. { authorization_servers, ... }</text>
+    <text x="375" y="136" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">5. { authorization_servers, ... }</text>
 
     <line x1="270" y1="160" x2="690" y2="160" stroke="#cfad64" stroke-width="1.2" marker-end="url(#8b466aaa)"/>
-    <text x="480" y="156" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">6. POST /register (DCR, RFC 7591)</text>
+    <text x="480" y="156" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">6. POST /register (DCR, RFC 7591)</text>
     <line x1="690" y1="180" x2="270" y2="180" stroke="#8fc9a1" stroke-width="1.2" marker-end="url(#a09g)"/>
-    <text x="480" y="176" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="9">7. { client_id }</text>
+    <text x="480" y="176" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="9">7. { client_id }</text>
 
     <line x1="270" y1="200" x2="75"  y2="200" stroke="#cfad64" stroke-width="1.2" marker-end="url(#8b466aaa)"/>
-    <text x="172" y="196" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">8. open browser to /authorize+PKCE</text>
+    <text x="172" y="196" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">8. open browser to /authorize+PKCE</text>
     <line x1="75"  y1="220" x2="690" y2="220" stroke="#93b6cd" stroke-width="1.2" marker-end="url(#8b466abb)"/>
-    <text x="380" y="216" text-anchor="middle" fill="#93b6cd" font-family="JetBrains Mono,monospace" font-size="9">9. user logs in &amp; consents (scopes for the MCP server)</text>
+    <text x="380" y="216" text-anchor="middle" fill="#93b6cd" font-family="Spline Sans Mono,monospace" font-size="9">9. user logs in &amp; consents (scopes for the MCP server)</text>
     <line x1="690" y1="240" x2="270" y2="240" stroke="#8fc9a1" stroke-width="1.2" marker-end="url(#a09g)"/>
-    <text x="480" y="236" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="9">10. 302 redirect → loopback?code=...</text>
+    <text x="480" y="236" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="9">10. 302 redirect → loopback?code=...</text>
 
     <line x1="270" y1="260" x2="690" y2="260" stroke="#cfad64" stroke-width="1.4" marker-end="url(#8b466aaa)"/>
-    <text x="480" y="256" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">11. POST /token (code, code_verifier, resource=https://mcp...)</text>
+    <text x="480" y="256" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">11. POST /token (code, code_verifier, resource=https://mcp...)</text>
     <line x1="690" y1="280" x2="270" y2="280" stroke="#8fc9a1" stroke-width="1.4" marker-end="url(#a09g)"/>
-    <text x="480" y="276" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="9">12. { access_token (aud=https://mcp...), refresh_token }</text>
+    <text x="480" y="276" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="9">12. { access_token (aud=https://mcp...), refresh_token }</text>
 
     <line x1="270" y1="300" x2="480" y2="300" stroke="#cfad64" stroke-width="1.2" marker-end="url(#8b466aaa)"/>
-    <text x="375" y="296" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">13. tools/call  Authorization: Bearer / DPoP &lt;at&gt;</text>
+    <text x="375" y="296" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">13. tools/call  Authorization: Bearer / DPoP &lt;at&gt;</text>
     <line x1="480" y1="320" x2="875" y2="320" stroke="#b2a3d0" stroke-width="1.2" marker-end="url(#a09r)"/>
-    <text x="675" y="316" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">14. server's own credentials → upstream API</text>
+    <text x="675" y="316" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">14. server's own credentials → upstream API</text>
     <line x1="875" y1="340" x2="270" y2="340" stroke="#da7d6b" stroke-width="1.2" marker-end="url(#a09r2)"/>
-    <text x="480" y="336" text-anchor="middle" fill="#da7d6b" font-family="JetBrains Mono,monospace" font-size="9">15. result → tool response back to host</text>
+    <text x="480" y="336" text-anchor="middle" fill="#da7d6b" font-family="Spline Sans Mono,monospace" font-size="9">15. result → tool response back to host</text>
 
     <defs>
       <marker id="a09b" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#93b6cd"/></marker>
@@ -857,32 +858,32 @@ DPoP: eyJ...   # fresh proof per request, signs htm+htu+iat+jti</code></pre>
   <svg class="diagram" viewBox="0 0 980 360" width="930" height="360">
     <!-- Hosts -->
     <rect x="20"  y="40" width="160" height="50" rx="8" fill="#19342a" stroke="#93b6cd" stroke-width="1.5"/>
-    <text x="100" y="65" text-anchor="middle" fill="#93b6cd" font-family="Playfair Display,serif" font-size="13" font-weight="700">Claude Desktop</text>
-    <text x="100" y="80" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">stdio MCP</text>
+    <text x="100" y="65" text-anchor="middle" fill="#93b6cd" font-family="Marcellus,serif" font-size="13" font-weight="700">Claude Desktop</text>
+    <text x="100" y="80" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">stdio MCP</text>
     <rect x="20"  y="110" width="160" height="50" rx="8" fill="#19342a" stroke="#93b6cd" stroke-width="1.5"/>
-    <text x="100" y="135" text-anchor="middle" fill="#93b6cd" font-family="Playfair Display,serif" font-size="13" font-weight="700">Cursor / VS Code</text>
-    <text x="100" y="150" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">stdio MCP</text>
+    <text x="100" y="135" text-anchor="middle" fill="#93b6cd" font-family="Marcellus,serif" font-size="13" font-weight="700">Cursor / VS Code</text>
+    <text x="100" y="150" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">stdio MCP</text>
     <rect x="20"  y="180" width="160" height="50" rx="8" fill="#19342a" stroke="#93b6cd" stroke-width="1.5"/>
-    <text x="100" y="205" text-anchor="middle" fill="#93b6cd" font-family="Playfair Display,serif" font-size="13" font-weight="700">claude.ai (web)</text>
-    <text x="100" y="220" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">Streamable HTTP</text>
+    <text x="100" y="205" text-anchor="middle" fill="#93b6cd" font-family="Marcellus,serif" font-size="13" font-weight="700">claude.ai (web)</text>
+    <text x="100" y="220" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">Streamable HTTP</text>
 
     <!-- Gateway -->
     <rect x="280" y="60" width="280" height="200" rx="10" fill="#132a22" stroke="#cfad64" stroke-width="2"/>
-    <text x="420" y="85" text-anchor="middle" fill="#cfad64" font-family="Playfair Display,serif" font-size="15" font-weight="700">Docker MCP Gateway</text>
+    <text x="420" y="85" text-anchor="middle" fill="#cfad64" font-family="Marcellus,serif" font-size="15" font-weight="700">Docker MCP Gateway</text>
     <rect x="300" y="100" width="115" height="35" rx="4" fill="#19342a" stroke="#cfad64"/>
-    <text x="357" y="122" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">MCP front-end</text>
+    <text x="357" y="122" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">MCP front-end</text>
     <rect x="425" y="100" width="115" height="35" rx="4" fill="#19342a" stroke="#cfad64"/>
-    <text x="482" y="122" text-anchor="middle" fill="#cfad64" font-family="JetBrains Mono,monospace" font-size="9">Catalog loader</text>
+    <text x="482" y="122" text-anchor="middle" fill="#cfad64" font-family="Spline Sans Mono,monospace" font-size="9">Catalog loader</text>
     <rect x="300" y="145" width="115" height="35" rx="4" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="357" y="167" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">OAuth interceptor</text>
+    <text x="357" y="167" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">OAuth interceptor</text>
     <rect x="425" y="145" width="115" height="35" rx="4" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="482" y="167" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">Token cache</text>
+    <text x="482" y="167" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">Token cache</text>
     <rect x="300" y="190" width="115" height="35" rx="4" fill="#19342a" stroke="#8fc9a1"/>
-    <text x="357" y="212" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="9">Secrets store</text>
+    <text x="357" y="212" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="9">Secrets store</text>
     <rect x="425" y="190" width="115" height="35" rx="4" fill="#19342a" stroke="#8fc9a1"/>
-    <text x="482" y="212" text-anchor="middle" fill="#8fc9a1" font-family="JetBrains Mono,monospace" font-size="9">Audit log</text>
+    <text x="482" y="212" text-anchor="middle" fill="#8fc9a1" font-family="Spline Sans Mono,monospace" font-size="9">Audit log</text>
     <rect x="300" y="235" width="240" height="20" rx="4" fill="#19342a" stroke="#7c968b"/>
-    <text x="420" y="249" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">policy / scope filter / tool allow-list</text>
+    <text x="420" y="249" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">policy / scope filter / tool allow-list</text>
 
     <!-- Lines hosts → gateway -->
     <line x1="180" y1="65"  x2="280" y2="120" stroke="#7c968b" stroke-width="1.2"/>
@@ -891,15 +892,15 @@ DPoP: eyJ...   # fresh proof per request, signs htm+htu+iat+jti</code></pre>
 
     <!-- Containers -->
     <rect x="640" y="40" width="160" height="40" rx="5" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="720" y="65" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">github MCP (cont.)</text>
+    <text x="720" y="65" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">github MCP (cont.)</text>
     <rect x="640" y="90" width="160" height="40" rx="5" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="720" y="115" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">slack MCP (cont.)</text>
+    <text x="720" y="115" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">slack MCP (cont.)</text>
     <rect x="640" y="140" width="160" height="40" rx="5" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="720" y="165" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">linear MCP (cont.)</text>
+    <text x="720" y="165" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">linear MCP (cont.)</text>
     <rect x="640" y="190" width="160" height="40" rx="5" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="720" y="215" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">notion MCP (cont.)</text>
+    <text x="720" y="215" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">notion MCP (cont.)</text>
     <rect x="640" y="240" width="160" height="40" rx="5" fill="#19342a" stroke="#b2a3d0"/>
-    <text x="720" y="265" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="10">filesystem MCP</text>
+    <text x="720" y="265" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="10">filesystem MCP</text>
 
     <line x1="560" y1="100" x2="640" y2="60"  stroke="#7c968b"/>
     <line x1="560" y1="130" x2="640" y2="110" stroke="#7c968b"/>
@@ -909,13 +910,13 @@ DPoP: eyJ...   # fresh proof per request, signs htm+htu+iat+jti</code></pre>
 
     <!-- AS -->
     <rect x="850" y="100" width="120" height="80" rx="8" fill="#19342a" stroke="#8fc9a1" stroke-width="1.5"/>
-    <text x="910" y="135" text-anchor="middle" fill="#8fc9a1" font-family="Playfair Display,serif" font-size="13" font-weight="700">Auth Server</text>
-    <text x="910" y="155" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">Auth0 / Keycloak /</text>
-    <text x="910" y="170" text-anchor="middle" fill="#ccd5c7" font-family="JetBrains Mono,monospace" font-size="9">Entra / ZITADEL ...</text>
+    <text x="910" y="135" text-anchor="middle" fill="#8fc9a1" font-family="Marcellus,serif" font-size="13" font-weight="700">Auth Server</text>
+    <text x="910" y="155" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">Auth0 / Keycloak /</text>
+    <text x="910" y="170" text-anchor="middle" fill="#ccd5c7" font-family="Spline Sans Mono,monospace" font-size="9">Entra / ZITADEL ...</text>
     <line x1="540" y1="160" x2="850" y2="140" stroke="#b2a3d0" stroke-width="1.2" stroke-dasharray="4,3"/>
-    <text x="700" y="135" text-anchor="middle" fill="#b2a3d0" font-family="JetBrains Mono,monospace" font-size="9">discovery + DCR + /token (per server)</text>
+    <text x="700" y="135" text-anchor="middle" fill="#b2a3d0" font-family="Spline Sans Mono,monospace" font-size="9">discovery + DCR + /token (per server)</text>
 
-    <text x="475" y="320" text-anchor="middle" fill="#7c968b" font-family="DM Sans,sans-serif" font-size="11">One MCP endpoint to the host. The Gateway fans out to many sandboxed servers, brokers OAuth per-server, and centralises audit.</text>
+    <text x="475" y="320" text-anchor="middle" fill="#7c968b" font-family="Hanken Grotesk,sans-serif" font-size="11">One MCP endpoint to the host. The Gateway fans out to many sandboxed servers, brokers OAuth per-server, and centralises audit.</text>
   </svg>
 </section>
 
