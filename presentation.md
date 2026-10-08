@@ -18,9 +18,9 @@ Discover  |  Register  |  Authorise  |  Bind  |  Audit
 2. [OAuth Refresher (One Slide)](#slide-02--oauth-refresher-one-slide)
 3. [What Is the Model Context Protocol?](#slide-03--what-is-the-model-context-protocol)
 4. [Local vs Remote MCP — Why Auth Matters](#slide-04--local-vs-remote-mcp--why-auth-matters)
-5. [The MCP Authorization Profile (2025-06)](#slide-05--the-mcp-authorization-profile-2025-06)
+5. [The MCP Authorization Profile (2025-06)](#slide-05--the-mcp-authorization-profile-2025-06) — before 2026-07-28
 6. [Discovery — How the Client Finds the AS](#slide-06--discovery--how-the-client-finds-the-as)
-7. [Dynamic Client Registration](#slide-07--dynamic-client-registration)
+7. [Dynamic Client Registration](#slide-07--dynamic-client-registration) — deprecated in 2026-07-28
 8. [End-to-End Sequence](#slide-08--end-to-end-sequence--host--mcp--as--resource)
 9. [Resource Indicators & Audience Binding in MCP](#slide-09--resource-indicators--audience-binding-in-mcp)
 10. [DPoP for MCP — Sender-Constrained Tokens](#slide-10--dpop-for-mcp--sender-constrained-tokens)
@@ -36,7 +36,9 @@ Discover  |  Register  |  Authorise  |  Bind  |  Audit
 20. [Worked Example 1 — claude.ai → Remote MCP → Auth0](#slide-20--worked-example-1--claudeai--remote-mcp--auth0)
 21. [Worked Example 2 — Claude Desktop → Docker Gateway → Keycloak](#slide-21--worked-example-2--claude-desktop--docker-gateway--keycloak)
 22. [Production Checklist](#slide-22--production-checklist)
-23. [Summary & References](#slide-23--summary--references)
+23. [The MCP Authorization Profile (2026-07-28)](#slide-23--the-mcp-authorization-profile-2026-07-28)
+24. [Client ID Metadata Documents](#slide-24--client-id-metadata-documents)
+25. [Summary & References](#slide-25--summary--references)
 
 ---
 
@@ -47,7 +49,7 @@ Discover  |  Register  |  Authorise  |  Bind  |  Audit
 - The Model Context Protocol — one-slide refresher
 - Local (stdio) vs Remote (HTTP / SSE / Streamable) servers
 - Why remote MCP *has* to use OAuth
-- The MCP authorisation profile (2025-06 spec)
+- The MCP authorisation profile (2025-06 spec) and its 2026-07-28 update
 
 ### The MCP OAuth flow
 
@@ -159,6 +161,8 @@ Every one of these is a thing OAuth gives you for free. That is why the MCP spec
 
 ## Slide 05 — The MCP Authorization Profile (2025-06)
 
+*Before 2026-07-28. The 2026-07-28 profile is slide 23.*
+
 The MCP spec includes a normative **Authorization** section for HTTP-based servers. It's a profile of OAuth 2.1 — pinning the choices a generic spec leaves open.
 
 ### What the MCP profile says — MUST
@@ -172,10 +176,10 @@ The MCP spec includes a normative **Authorization** section for HTTP-based serve
 
 ### What it says — SHOULD / MAY
 
-- **Dynamic Client Registration** (RFC 7591) so users don't have to pre-register every host.
-- **DPoP** (RFC 9449) for sender-constrained tokens — strongly recommended over plain Bearer.
+- **Dynamic Client Registration** (RFC 7591) so users don't have to pre-register every host. *(Deprecated in 2026-07-28.)*
+- **DPoP** (RFC 9449) for sender-constrained tokens — strongly recommended over plain Bearer. *Correction: DPoP is this deck's recommendation, not part of the MCP spec in either era.*
 - Refresh tokens with **rotation**.
-- Scopes named after MCP capabilities (e.g. `tools:write`, `resources:read`).
+- Scopes named after MCP capabilities (e.g. `tools:write`, `resources:read`). *Correction: scope names are server-defined; the spec does not name them.*
 - OIDC if the server needs to know who the user is, not just that they're authorised.
 
 ### Anti-patterns the spec calls out by name
@@ -234,6 +238,8 @@ GET /.well-known/oauth-authorization-server
 ---
 
 ## Slide 07 — Dynamic Client Registration
+
+*Deprecated in MCP 2026-07-28 in favour of Client ID Metadata Documents (slide 24); kept as a fallback, and a DCR client must send an appropriate `application_type`.*
 
 Pre-MCP, every OAuth client was registered by hand in the AS UI. That doesn't scale to "any user, any host". **RFC 7591 Dynamic Client Registration** lets the host register itself the first time it sees a server.
 
@@ -867,7 +873,53 @@ RFC 9700 (BCP 240) · MCP Authorization spec · RFC 9728 · RFC 8707 · RFC 9449
 
 ---
 
-## Slide 23 — Summary & References
+## Slide 23 — The MCP Authorization Profile (2026-07-28)
+
+Revision 2026-07-28 made MCP stateless, but the OAuth profile changed less than the transport.
+
+**Unchanged MUSTs**
+
+- MCP server = OAuth 2.1 Resource Server; publishes RFC 9728 metadata; 401 + `WWW-Authenticate` (with `resource_metadata`, and since 2025-11-25 a SHOULD `scope`).
+- Client: Authorization Code + PKCE S256; refuse to proceed if the AS metadata lists no `code_challenge_methods_supported`.
+- RFC 8707 `resource` in authorization *and* token requests; the server validates the audience and accepts no other tokens.
+- No token passthrough. Refresh tokens rotated for public clients.
+
+**New or changed**
+
+- Registration order: pre-registered → Client ID Metadata Document (if the AS advertises it) → DCR (deprecated) → ask the user.
+- Mix-up defence: the client records the AS `issuer` and MUST validate a returned `iss` (RFC 9207) before redeeming the code; the AS SHOULD send it.
+- Issuer-bound credentials: key them by issuer, never reuse with another AS, re-register when the AS changes.
+- DCR clients send `application_type`. OIDC Discovery for the AS (2025-11-25).
+- No protocol sessions: the token is checked on every stateless request; the security guidance speaks of state-handle hijacking.
+
+Animated: [Agent Protocols Explained, chapter 6](https://agent-protocols-explained.vercel.app/learn/06-authorisation).
+
+Sources: [Authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization), [Client registration](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration), [Security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations), [Key changes](https://modelcontextprotocol.io/specification/2026-07-28/changelog) (accessed 2026-10-08).
+
+---
+
+## Slide 24 — Client ID Metadata Documents
+
+The `client_id` *is* an HTTPS URL; the authorization server fetches the client's metadata from it.
+
+```json
+{
+  "client_id": "https://app.example.com/oauth/client-metadata.json",
+  "client_name": "Example MCP Client",
+  "redirect_uris": ["http://127.0.0.1:3000/callback", "http://localhost:3000/callback"],
+  "grant_types": ["authorization_code"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none"
+}
+```
+
+The AS opts in with `"client_id_metadata_document_supported": true` in its metadata. Flow: the client sends the URL as `client_id`; the AS fetches it, checks that the document's `client_id` equals the URL and that the `redirect_uri` is listed, shows `client_name` on consent, and caches the document per HTTP headers. Still on you: SSRF when fetching, and `localhost` redirect impersonation.
+
+Sources: [Client registration](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration#client-id-metadata-documents), [Deprecated features](https://modelcontextprotocol.io/specification/2026-07-28/deprecated) (accessed 2026-10-08).
+
+---
+
+## Slide 25 — Summary & References
 
 ### What we covered
 

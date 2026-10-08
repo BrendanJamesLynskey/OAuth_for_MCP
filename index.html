@@ -124,6 +124,7 @@
 </style>
 <style>:root{font-synthesis-weight:none}
 /* deck-mobile-fix:reveal */ .reveal pre{max-width:100%;box-sizing:border-box}.reveal pre code{white-space:pre-wrap !important;overflow-wrap:anywhere}.cols>*{min-width:0}.reveal :not(pre)>code{overflow-wrap:anywhere}
+/* era-tag (brief 28) */ .era-tag{display:inline-block;font-family:'Spline Sans Mono',monospace;font-size:.42em;font-weight:500;letter-spacing:.02em;text-transform:none;padding:.1em .5em;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--bg3);vertical-align:middle;margin-left:.4em;white-space:nowrap}@media (max-width:640px){.era-tag{white-space:normal;max-width:100%}}.era-tag.now{color:var(--green);border-color:var(--green)}.reveal p.spec-cite{font-size:.42em;color:var(--muted);margin-top:.4em}.reveal p.spec-cite a{color:var(--green)}.reveal li .era-tag,.reveal p .era-tag{font-size:.75em}
 </style>
 </head>
 <body>
@@ -163,6 +164,9 @@
     <div class="meta" style="margin-top:1.4em;">
       Discover &nbsp;·&nbsp; Register &nbsp;·&nbsp; Authorise &nbsp;·&nbsp; Bind &nbsp;·&nbsp; Audit
     </div>
+    <div class="meta" style="margin-top:.6em;">
+      Updated for MCP revision 2026-07-28 (slides 23&ndash;24); 2025-06 material is tagged &ldquo;before 2026-07-28&rdquo;.
+    </div>
   </div>
 </section>
 
@@ -181,14 +185,14 @@
           <li>The Model Context Protocol — one-slide refresher</li>
           <li>Local (stdio) vs Remote (HTTP / SSE / Streamable) servers</li>
           <li>Why remote MCP <em>has</em> to use OAuth</li>
-          <li>The MCP authorisation profile (2025-06 spec)</li>
+          <li>The MCP authorisation profile (2025-06 spec) and its 2026-07-28 update</li>
         </ul>
       </div>
       <div class="card green" style="margin-top:0.5em;">
         <h3 class="g">The MCP OAuth flow</h3>
         <ul>
           <li>Discovery — RFC 9728 + RFC 8414</li>
-          <li>Dynamic Client Registration (RFC 7591)</li>
+          <li>Dynamic Client Registration (RFC 7591) &mdash; and Client ID Metadata Documents, which replace it in 2026-07-28</li>
           <li>End-to-end sequence with Auth Code + PKCE + RIs</li>
           <li>Confused-deputy &amp; token-passthrough — what NOT to do</li>
         </ul>
@@ -372,7 +376,7 @@
 <section data-background-color="#0f231c">
   <div class="slide-hdr">
     <span class="tag">05</span>
-    <h2>The MCP Authorization Profile (2025-06)</h2>
+    <h2>The MCP Authorization Profile (2025-06) <span class="era-tag">before 2026-07-28</span></h2>
   </div>
   <p>The MCP spec includes a normative <span class="a">Authorization</span> section for HTTP-based servers. It's a profile of OAuth 2.1 — pinning the choices a generic spec leaves open.</p>
 
@@ -394,11 +398,12 @@
       <div class="card green">
         <h3 class="g">What it says — SHOULD / MAY</h3>
         <ul>
-          <li><span class="g">Dynamic Client Registration</span> (RFC 7591) so users don't have to pre-register every host.</li>
-          <li><span class="g">DPoP</span> (RFC 9449) for sender-constrained tokens — strongly recommended over plain Bearer.</li>
+          <li><span class="g">Dynamic Client Registration</span> (RFC 7591) so users don't have to pre-register every host. <span class="era-tag">deprecated in 2026-07-28</span></li>
+          <li><span class="g">DPoP</span> (RFC 9449) for sender-constrained tokens — strongly recommended over plain Bearer. <em>Correction: DPoP is this deck's recommendation, not part of the MCP spec in either era.</em></li>
           <li>Refresh tokens with <span class="g">rotation</span>.</li>
-          <li>Scopes named after MCP capabilities (e.g. <code>tools:write</code>, <code>resources:read</code>).</li>
+          <li>Scopes named after MCP capabilities (e.g. <code>tools:write</code>, <code>resources:read</code>). <em>Correction: scope names are server-defined; the spec does not name them.</em></li>
           <li>OIDC if the server needs to know who the user is, not just that they're authorised.</li>
+          <li>Refresh-token rotation is a MUST for public clients in the spec, not a SHOULD.</li>
         </ul>
       </div>
       <div class="card red" style="margin-top:0.4em;">
@@ -411,6 +416,8 @@
       </div>
     </div>
   </div>
+  <p style="margin-top:.4em;">The 2026-07-28 profile keeps every MUST on the left and changes registration and issuer checks: see slide 23.</p>
+  <p class="spec-cite">Source: MCP specification 2026-07-28 &mdash; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization">Authorization</a> &middot; <a href="https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization">2025-06-18 authorization</a> (accessed 2026-10-08).</p>
 </section>
 
 
@@ -420,7 +427,7 @@
     <span class="tag">06</span>
     <h2>Discovery — How the Client Finds the AS</h2>
   </div>
-  <p>The MCP client doesn't get told upfront which auth server to use. It asks the MCP server.</p>
+  <p>The MCP client doesn't get told upfront which auth server to use. It asks the MCP server. (Unchanged in 2026-07-28, which also accepts OpenID Connect Discovery for the AS since 2025-11-25; the AS metadata may now advertise <code>client_id_metadata_document_supported</code>, and the client records the <code>issuer</code> to check <code>iss</code> later.)</p>
 
   <svg class="diagram" viewBox="0 0 920 250" width="860" height="250">
     <rect x="20"  y="20" width="170" height="40" rx="5" fill="#19342a" stroke="#cfad64" stroke-width="1.5"/>
@@ -493,9 +500,9 @@
 <section data-background-color="#0f231c">
   <div class="slide-hdr">
     <span class="tag">07</span>
-    <h2>Dynamic Client Registration</h2>
+    <h2>Dynamic Client Registration <span class="era-tag">deprecated in 2026-07-28</span></h2>
   </div>
-  <p>Pre-MCP, every OAuth client was registered by hand in the AS UI. That doesn't scale to "any user, any host". <span class="a">RFC 7591 Dynamic Client Registration</span> lets the host register itself the first time it sees a server.</p>
+  <p>Pre-MCP, every OAuth client was registered by hand in the AS UI. That doesn't scale to "any user, any host". <span class="a">RFC 7591 Dynamic Client Registration</span> lets the host register itself the first time it sees a server. In MCP 2026-07-28 DCR is <span class="a">deprecated</span> in favour of Client ID Metadata Documents (slide 24) and kept as a fallback; a DCR client must send an appropriate <code>application_type</code>, as below.</p>
 
   <div class="cols cols-2" style="margin-top:0.3em;">
     <div>
@@ -1366,7 +1373,7 @@ audit:
           <li>Return rich <code>WWW-Authenticate</code> with <code>resource_metadata</code> on 401.</li>
           <li>Never forward the user's token downstream — use service credentials or RFC 8693 Token Exchange.</li>
           <li>Scrub <code>Authorization</code> &amp; <code>DPoP</code> from logs.</li>
-          <li>Rate-limit DCR; require Initial Access Token in production.</li>
+          <li>Rate-limit DCR; require Initial Access Token in production. (2026-07-28: prefer Client ID Metadata Documents; DCR is deprecated.)</li>
         </ul>
       </div>
       <div class="card green" style="margin-top:0.4em;">
@@ -1377,7 +1384,8 @@ audit:
           <li>Generate a fresh DPoP keypair per server (or per session).</li>
           <li>Rotate refresh tokens; treat reuse as compromise.</li>
           <li>Store tokens in OS keychain / DPAPI, not plaintext config.</li>
-          <li>Validate the <code>iss</code> on the callback (RFC 9207).</li>
+          <li>Validate the <code>iss</code> on the callback (RFC 9207) &mdash; a MUST in MCP 2026-07-28 when present.</li>
+          <li>Key stored client credentials by issuer; never reuse them with another AS (2026-07-28).</li>
         </ul>
       </div>
     </div>
@@ -1389,6 +1397,7 @@ audit:
           <li>Refresh token rotation on for public clients.</li>
           <li>Strict <code>redirect_uri</code> string match.</li>
           <li>DCR disabled by default; opt-in per realm with software statements / Initial Access Tokens.</li>
+          <li>Support Client ID Metadata Documents and advertise <code>client_id_metadata_document_supported</code>; return <code>iss</code> (2026-07-28).</li>
           <li>DPoP supported; FAPI 2.0 profile available for high-value APIs.</li>
           <li>Realm-level audit trail of every <code>/authorize</code>, <code>/token</code>, <code>/register</code>.</li>
         </ul>
@@ -1412,10 +1421,98 @@ audit:
 </section>
 
 
-<!-- ═══════════════════════════════ SLIDE 24 — SUMMARY ═══════════════════════════════ -->
+<!-- ═══════════════════════════════ SLIDE 24 — 2026-07-28 PROFILE (brief 28) ═══════════════════════════════ -->
 <section data-background-color="#0f231c">
   <div class="slide-hdr">
     <span class="tag">23</span>
+    <h2>The MCP Authorization Profile (2026-07-28) <span class="era-tag now">2026-07-28</span></h2>
+  </div>
+  <p>Revision 2026-07-28 made MCP stateless, but the OAuth profile changed less than the transport. What stayed, and what moved:</p>
+  <div class="cols cols-2" style="margin-top:0.3em;">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Unchanged MUSTs</h3>
+        <ul>
+          <li>MCP server = OAuth 2.1 <span class="g">Resource Server</span>; publishes <span class="g">RFC 9728</span> metadata; 401 + <code>WWW-Authenticate</code> (with <code>resource_metadata</code>, and since 2025-11-25 a SHOULD <code>scope</code>).</li>
+          <li>Client: Authorization Code + <span class="g">PKCE S256</span>; refuse to proceed if the AS metadata lists no <code>code_challenge_methods_supported</code>.</li>
+          <li><span class="g">RFC 8707</span> <code>resource</code> in authorization <em>and</em> token requests; the server validates the audience and accepts no other tokens.</li>
+          <li>No token passthrough. Refresh tokens rotated for public clients.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">New or changed</h3>
+        <ul>
+          <li><span class="a">Registration order:</span> pre-registered &rarr; <span class="g">Client ID Metadata Document</span> (if the AS advertises it) &rarr; DCR (deprecated) &rarr; ask the user.</li>
+          <li><span class="a">Mix-up defence:</span> the client records the AS <code>issuer</code> and MUST validate a returned <code>iss</code> (RFC 9207) before redeeming the code; the AS SHOULD send it (expected to become a MUST).</li>
+          <li><span class="a">Issuer-bound credentials:</span> key them by issuer, never reuse with another AS, re-register when the AS changes.</li>
+          <li>DCR clients send <code>application_type</code>. OIDC Discovery for the AS (2025-11-25).</li>
+        </ul>
+      </div>
+      <div class="card purple" style="margin-top:0.4em;">
+        <h3 class="p">No sessions to protect</h3>
+        <p>Without <code>Mcp-Session-Id</code>, the bearer token is checked on every stateless request; cross-call state lives in server-minted handles, so the 2026-07-28 guidance renames session hijacking to <span class="a">state-handle hijacking</span>. <a href="https://agent-protocols-explained.vercel.app/learn/06-authorisation">Agent Protocols Explained, chapter 6</a> animates this flow.</p>
+      </div>
+    </div>
+  </div>
+  <p class="spec-cite">Source: MCP specification 2026-07-28 &mdash; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization">Authorization</a> &middot; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration">Client registration</a> &middot; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations">Security considerations</a> &middot; <a href="https://modelcontextprotocol.io/specification/2026-07-28/changelog">Key changes</a> (accessed 2026-10-08).</p>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 25 — CIMD (brief 28) ═══════════════════════════════ -->
+<section data-background-color="#0f231c">
+  <div class="slide-hdr">
+    <span class="tag">24</span>
+    <h2>Client ID Metadata Documents <span class="era-tag now">2026-07-28</span></h2>
+  </div>
+  <p>The <code>client_id</code> <em>is</em> an HTTPS URL; the authorization server fetches the client's metadata from it. No <code>/register</code> call, no per-AS client record, and the consent page can show a name the AS fetched from the client's own domain.</p>
+  <div class="cols cols-2" style="margin-top:0.3em;">
+    <div>
+      <div class="card amber">
+        <h3 class="a">Hosted by the client</h3>
+<pre><code>GET https://app.example.com/oauth/client-metadata.json
+
+{
+  "client_id": "https://app.example.com/oauth/client-metadata.json",
+  "client_name": "Example MCP Client",
+  "redirect_uris": ["http://127.0.0.1:3000/callback",
+                    "http://localhost:3000/callback"],
+  "grant_types": ["authorization_code"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none"
+}</code></pre>
+      </div>
+      <div class="card blue" style="margin-top:0.4em;">
+        <h3 class="b">AS metadata opt-in</h3>
+<pre><code>{ "client_id_metadata_document_supported": true }</code></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card green">
+        <h3 class="g">The flow</h3>
+        <ol style="padding-left:1.2em;">
+          <li>Client sends <code>/authorize?client_id=https://app.example.com/oauth/client-metadata.json&amp;redirect_uri=&hellip;</code> with PKCE and <code>resource</code>.</li>
+          <li>AS sees a URL-shaped <code>client_id</code> and GETs it.</li>
+          <li>AS checks: document <code>client_id</code> equals the URL; <code>redirect_uri</code> is listed; required fields present (optionally, a domain trust policy).</li>
+          <li>Consent page shows <code>client_name</code>; code &rarr; token as usual, same URL as <code>client_id</code>.</li>
+          <li>AS caches the document per HTTP cache headers.</li>
+        </ol>
+      </div>
+      <div class="card red" style="margin-top:0.4em;">
+        <h3 class="r">Still on you</h3>
+        <p>A metadata URL proves control of a domain, not trustworthiness: keep consent screens explicit, and apply the CIMD security considerations (SSRF when fetching, localhost redirect impersonation).</p>
+      </div>
+    </div>
+  </div>
+  <p class="spec-cite">Source: MCP specification 2026-07-28 &mdash; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration#client-id-metadata-documents">Client registration: CIMD</a> &middot; <a href="https://modelcontextprotocol.io/specification/2026-07-28/deprecated">Deprecated features</a> &middot; <a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations">Security considerations</a> (accessed 2026-10-08).</p>
+</section>
+
+
+<!-- ═══════════════════════════════ SLIDE 26 — SUMMARY ═══════════════════════════════ -->
+<section data-background-color="#0f231c">
+  <div class="slide-hdr">
+    <span class="tag">25</span>
     <h2>Summary &amp; References</h2>
   </div>
   <div class="cols cols-2">
@@ -1424,7 +1521,7 @@ audit:
         <h3 class="a">What we covered</h3>
         <ul>
           <li>Why remote MCP needs OAuth (not API keys)</li>
-          <li>The 2025-06 MCP authorization profile — Auth Code + PKCE + RFC 9728 + RFC 8707</li>
+          <li>The 2025-06 MCP authorization profile — Auth Code + PKCE + RFC 9728 + RFC 8707 — and its 2026-07-28 update (CIMD, <code>iss</code>, issuer-bound credentials)</li>
           <li>Discovery flow and Dynamic Client Registration</li>
           <li>Audience binding and DPoP for sender-constrained tokens</li>
           <li>Confused-deputy and token-passthrough — the things to avoid</li>

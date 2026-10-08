@@ -21,9 +21,9 @@ An interactive Reveal.js presentation covering **OAuth for the Model Context Pro
 | 03 | OAuth Refresher | One-slide recap of Part 1 |
 | 04 | What Is MCP? | Hosts, clients, servers, tools, resources, prompts |
 | 05 | Local vs Remote | Why HTTP MCP servers must use OAuth |
-| 06 | MCP Auth Profile | The 2025-06 normative spec — MUSTs and SHOULDs |
+| 06 | MCP Auth Profile | The 2025-06 normative spec — MUSTs and SHOULDs (before 2026-07-28) |
 | 07 | Discovery | RFC 9728 protected-resource + RFC 8414 AS metadata |
-| 08 | Dynamic Client Registration | RFC 7591, Initial Access Tokens, software statements |
+| 08 | Dynamic Client Registration | RFC 7591, Initial Access Tokens, software statements (deprecated in MCP 2026-07-28) |
 | 09 | End-to-End Sequence | Host → MCP → AS → Resource → Upstream API |
 | 10 | Resource Indicators | RFC 8707 audience binding for MCP |
 | 11 | DPoP for MCP | Sender-constrained tokens; what the RS must validate |
@@ -39,9 +39,13 @@ An interactive Reveal.js presentation covering **OAuth for the Model Context Pro
 | 21 | Worked Example 1 | claude.ai → public remote MCP → Auth0 |
 | 22 | Worked Example 2 | Claude Desktop → Docker Gateway → Keycloak |
 | 23 | Production Checklist | RS, host, AS, operational |
-| 24 | Summary | Take-aways and references |
+| 24 | MCP Auth Profile (2026-07-28) | What stayed, what changed: CIMD-first registration, `iss` validation, issuer-bound credentials |
+| 25 | Client ID Metadata Documents | The 2026-07-28 replacement for DCR — document, flow, AS checks |
+| 26 | Summary | Take-aways and references |
 
 ---
+
+**Updated October 2026 for MCP revision 2026-07-28.** The 2025-06 profile slides stay, tagged "before 2026-07-28"; two new slides cover the 2026-07-28 profile ([changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog), [client registration](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration), accessed 2026-10-08). The slide-05 claims that DPoP and capability-named scopes are part of the MCP profile were corrected: they are this deck's recommendations.
 
 ## Slide Controls
 
@@ -68,6 +72,7 @@ MCP specification — modelcontextprotocol.io/specification · Anthropic MCP doc
 - [Introduction to OAuth (Part 1)](https://github.com/BrendanJamesLynskey/Introduction_to_OAuth) — the OAuth protocol foundations this deck builds on.
 - [Introduction to OpenID Connect](https://github.com/BrendanJamesLynskey/Introduction_to_OpenID_Connect) — the identity layer used wherever an MCP server needs to know *who* the user is, not just *what* they're allowed to do.
 - [Cloud_aaS_04_SaaS_Architecture](https://github.com/BrendanJamesLynskey/Cloud_aaS_04_SaaS_Architecture) — B2B identity (SAML / OIDC / SCIM) for multi-tenant SaaS.
+- [Agent Protocols Explained](https://agent-protocols-explained.vercel.app/learn/06-authorisation) — the 2026-07-28 authorisation flow, animated, with each check breakable.
 - Series hub: [Cloud `*aaS`](https://github.com/BrendanJamesLynskey/Cloud_aaS_Hub).
 
 ## License
