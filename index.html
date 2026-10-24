@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-concept="passport" lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -126,6 +126,37 @@
 /* deck-mobile-fix:reveal */ .reveal pre{max-width:100%;box-sizing:border-box}.reveal pre code{white-space:pre-wrap !important;overflow-wrap:anywhere}.cols>*{min-width:0}.reveal :not(pre)>code{overflow-wrap:anywhere}
 /* era-tag (brief 28) */ .era-tag{display:inline-block;font-family:'Spline Sans Mono',monospace;font-size:.42em;font-weight:500;letter-spacing:.02em;text-transform:none;padding:.1em .5em;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--bg3);vertical-align:middle;margin-left:.4em;white-space:nowrap}@media (max-width:640px){.era-tag{white-space:normal;max-width:100%}}.era-tag.now{color:var(--green);border-color:var(--green)}.reveal p.spec-cite{font-size:.42em;color:var(--muted);margin-top:.4em}.reveal p.spec-cite a{color:var(--green)}.reveal li .era-tag,.reveal p .era-tag{font-size:.75em}
 </style>
+<style id="deck-concept">@import url('https://fonts.googleapis.com/css2?family=OCR+B&family=Special+Elite&display=swap');
+html[data-concept=passport] .reveal .slides section.title-slide.present:has(.cx-fig){display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-auto-rows:min-content;column-gap:52px;align-content:start;text-align:left;height:100%;padding:24px 10px!important;box-sizing:border-box}
+html[data-concept=passport] .title-slide:has(.cx-fig)>*{grid-column:1;margin-left:0!important;margin-right:0!important;max-width:none!important}
+html[data-concept=passport] .title-slide:has(.cx-fig) div[style*="letter-spacing"],html[data-concept=passport] .title-slide:has(.cx-fig) div[style*="width:60px"]{display:none!important}
+html[data-concept=passport] .title-slide:has(.cx-fig)>div:not([class]){padding:0!important;text-align:left!important}
+html[data-concept=passport] .cx-head{grid-column:1/-1!important;display:flex;justify-content:space-between;border-bottom:1px solid var(--muted);padding-bottom:8px;margin-bottom:30px;font-size:.34em;color:var(--text)}
+html[data-concept=passport] .cx-head span:last-child{color:var(--muted)}
+html[data-concept=passport] .title-slide:has(.cx-fig) h1{font-size:1.75em!important;line-height:1.02!important;text-transform:none!important;text-align:left!important;margin:0 0 .35em!important;hyphens:manual;overflow-wrap:normal;word-break:normal}
+html[data-concept=passport] .title-slide:has(.cx-fig) .subtitle,html[data-concept=passport] .title-slide:has(.cx-fig) .meta{text-align:left!important}
+html[data-concept=passport] .title-slide:has(.cx-fig) .pill{border-radius:2px!important}
+html[data-concept=passport] .cx-fig{grid-column:2!important;grid-row:2/span 8;margin:0!important;align-self:start}
+html[data-concept=passport] .cx-fig figcaption{font-size:.3em;line-height:1.45;color:var(--muted);margin-top:.6em;text-align:left;}
+html[data-concept=passport] .concept-art{display:block;width:100%;height:auto;overflow:visible}
+
+html[data-concept=passport] .concept-art{filter:drop-shadow(0 12px 22px rgba(0,0,0,.45))}
+html[data-concept=passport] .concept-art .pp-page{fill:#ece4cf}
+html[data-concept=passport] .concept-art .pp-guilloche{fill:none;stroke:#b9c9b2;stroke-width:.7}
+html[data-concept=passport] .concept-art .pp-hdr{font-family:'Special Elite',monospace;font-size:13px;fill:#5b6b5a;letter-spacing:.2em}
+html[data-concept=passport] .concept-art .pp-stamp{opacity:.82;mix-blend-mode:multiply}
+html[data-concept=passport] .concept-art .pp-ring{fill:none;stroke-width:3}
+html[data-concept=passport] .concept-art .pp-thin{stroke-width:1.2}
+html[data-concept=passport] .concept-art .pp-st{font-family:'Special Elite',monospace;font-weight:700;letter-spacing:.06em}
+html[data-concept=passport] .concept-art .pp-ss{font-family:'Special Elite',monospace;font-size:10px}
+html[data-concept=passport] .concept-art .pp-red{stroke:#b3332b;fill:#b3332b}
+html[data-concept=passport] .concept-art .pp-blue{stroke:#2b4c8f;fill:#2b4c8f}
+html[data-concept=passport] .concept-art .pp-green{stroke:#2f6b47;fill:#2f6b47}
+html[data-concept=passport] .concept-art .pp-violet{stroke:#5f3c86;fill:#5f3c86}
+html[data-concept=passport] .concept-art circle.pp-ring,html[data-concept=passport] .concept-art rect.pp-ring{fill:none}
+html[data-concept=passport] .concept-art .pp-mrzband{fill:#e2d9c0}
+html[data-concept=passport] .concept-art .pp-mrz{font-family:'OCR B','OCR-B','Courier New',monospace;font-size:14.6px;fill:#1f1f1f;letter-spacing:.06em}
+</style>
 </head>
 <body>
 <div class="reveal">
@@ -134,6 +165,7 @@
 
 <!-- ═══════════════════════════════ SLIDE 01 — TITLE ═══════════════════════════════ -->
 <section class="title-slide" data-background-color="#0f231c">
+<!-- deck-concept:start --><div class="cx-head" aria-hidden="true"><span>Identity & authorisation</span><span>OAuth for MCP</span></div><figure class="cx-fig"><svg class="concept-art" viewBox="0 0 480 420" role="img" aria-label="A passport visa page with stamps: 401 + METADATA, REGISTER, AUTHORISE, TOKEN" xmlns="http://www.w3.org/2000/svg"><rect class="pp-page" width="480" height="420" rx="8"/><path class="pp-guilloche" d="M0 30 C 120 10, 360 50, 480 30"/><path class="pp-guilloche" d="M0 52 C 120 32, 360 72, 480 52"/><path class="pp-guilloche" d="M0 74 C 120 54, 360 94, 480 74"/><path class="pp-guilloche" d="M0 96 C 120 76, 360 116, 480 96"/><path class="pp-guilloche" d="M0 118 C 120 98, 360 138, 480 118"/><path class="pp-guilloche" d="M0 140 C 120 120, 360 160, 480 140"/><path class="pp-guilloche" d="M0 162 C 120 142, 360 182, 480 162"/><path class="pp-guilloche" d="M0 184 C 120 164, 360 204, 480 184"/><path class="pp-guilloche" d="M0 206 C 120 186, 360 226, 480 206"/><path class="pp-guilloche" d="M0 228 C 120 208, 360 248, 480 228"/><path class="pp-guilloche" d="M0 250 C 120 230, 360 270, 480 250"/><path class="pp-guilloche" d="M0 272 C 120 252, 360 292, 480 272"/><path class="pp-guilloche" d="M0 294 C 120 274, 360 314, 480 294"/><path class="pp-guilloche" d="M0 316 C 120 296, 360 336, 480 316"/><text class="pp-hdr" x="24" y="34">VISAS</text><text class="pp-hdr" x="456" y="34" text-anchor="end">35</text><g transform="rotate(-4.277817778873196 118.1 116.8)" class="pp-stamp"><rect class="pp-ring pp-red" x="32.1" y="82.8" width="172" height="68" rx="6"/><rect class="pp-ring pp-thin pp-red" x="38.1" y="88.8" width="160" height="56" rx="4"/><text class="pp-st pp-red" x="118.1" y="118.8" text-anchor="middle" style="font-size:11px">401 + METADATA</text><text class="pp-ss pp-red" x="118.1" y="134.8" text-anchor="middle">protected resource</text></g><g transform="rotate(15.569566363923023 338.9 115)" class="pp-stamp"><circle class="pp-ring pp-blue" cx="338.9" cy="115" r="58"/><circle class="pp-ring pp-thin pp-blue" cx="338.9" cy="115" r="50"/><text class="pp-st pp-blue" x="338.9" y="117" text-anchor="middle" style="font-size:14px">REGISTER</text><text class="pp-ss pp-blue" x="338.9" y="133" text-anchor="middle">dynamic client</text></g><g transform="rotate(4.8234206954963454 134.8 250.8)" class="pp-stamp"><rect class="pp-ring pp-green" x="48.8" y="216.8" width="172" height="68" rx="6"/><rect class="pp-ring pp-thin pp-green" x="54.8" y="222.8" width="160" height="56" rx="4"/><text class="pp-st pp-green" x="134.8" y="252.8" text-anchor="middle" style="font-size:14px">AUTHORISE</text><text class="pp-ss pp-green" x="134.8" y="268.8" text-anchor="middle">PKCE, S256</text></g><g transform="rotate(-13.232236898736943 349.7 250.6)" class="pp-stamp"><circle class="pp-ring pp-violet" cx="349.7" cy="250.6" r="58"/><circle class="pp-ring pp-thin pp-violet" cx="349.7" cy="250.6" r="50"/><text class="pp-st pp-violet" x="349.7" y="252.6" text-anchor="middle" style="font-size:14px">TOKEN</text><text class="pp-ss pp-violet" x="349.7" y="268.6" text-anchor="middle">audience = server</text></g><rect class="pp-mrzband" x="0" y="356" width="480" height="64"/><text class="pp-mrz" x="16" y="382">P&lt;UTOOAUTH&lt;FOR&lt;MCP&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text><text class="pp-mrz" x="16" y="404">OAUTH20266UTO2601010X3612314&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;8</text></svg><figcaption>Stamped on this page: 401 + Metadata · Register · Authorise · Token. The machine-readable zone’s check digits are real ICAO 9303 arithmetic.</figcaption></figure><!-- deck-concept:end -->
   <div style="text-align:left; max-width:820px; margin:0 auto; padding: 1em 0;">
     <div style="font-family:'Spline Sans Mono',monospace; font-size:.5em; color:var(--muted); margin-bottom:.4em; letter-spacing:.1em;">
       TECHNICAL PRESENTATION &middot; PART 2 OF 2
